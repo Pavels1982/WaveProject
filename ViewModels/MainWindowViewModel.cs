@@ -80,7 +80,7 @@ namespace VoiceСhanging.ViewModels
             // List<Complex> FFTcom = new List<Complex>(Fourier.NaiveForward(selectedData.ToArray(), FourierOptions.Default).ToList());
 
             FFTcom = FFTHelper.FFT(selectedData.ToArray()).ToList();
-            // FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+            FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
             //int j = (FFTcom.Count - 1);
             //for (int y = 0; y < 300; y++)
             //{
@@ -89,12 +89,41 @@ namespace VoiceСhanging.ViewModels
             //}
 
             int x = 0;
-            FFTcom.ForEach(comp => FFT.Line.Points.Add(new DataPoint(x++, comp.Magnitude)));
+            FFTcom.ForEach(comp =>
+            {
+                // FFT.Line.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
+                //FFT.Line.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
+                FFT.Line.Points.Add(new DataPoint(x++,comp.Magnitude));
+
+            }
+            
+            );
 
             FFT.Model.Axes[0].AbsoluteMaximum = ChartModel.Line.Points.Count();
             FFT.Model.InvalidatePlot(true);
-            IFFT();
+           // IFFT();
         }
+
+        private double GetYPos(Complex c)
+        {
+            return Math.Sqrt(c.Real * c.Real + c.Imaginary * c.Imaginary); 
+        }
+
+
+        private double GetYPosLog(Complex c)
+        {
+            // not entirely sure whether the multiplier should be 10 or 20 in this case.
+            // going with 10 from here http://stackoverflow.com/a/10636698/7532
+            double intensityDB = 10 * Math.Log10(Math.Sqrt(c.Real * c.Real + c.Imaginary * c.Imaginary));
+            double minDB = -90;
+            if (intensityDB < minDB) intensityDB = minDB;
+            double percent = intensityDB / minDB;
+            // we want 0dB to be at the top (i.e. yPos = 0)
+            double yPos = percent;
+            return yPos;
+        }
+
+
 
         private void ReadDataWave()
         {
