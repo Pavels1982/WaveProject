@@ -23,6 +23,8 @@ namespace VoiceСhanging.Models
         public int X { get; set; }
         private int startX { get; set; }
         private int width = 5000;
+        public List<DataPoint> SelectedData { get; set; } = new List<DataPoint>();
+
         public int Width
         {
             get
@@ -31,7 +33,7 @@ namespace VoiceСhanging.Models
             }
             set
             {
-                if (value > 100 && value < 50000)
+                if (value > 20 && value < 50000)
                 {
                     this.width = value;
                     Model.Axes[0].MaximumRange = value;
@@ -63,10 +65,12 @@ namespace VoiceСhanging.Models
 
 
             Line.Color = OxyColor.FromRgb(0, 0, 255);
-
             Model.Series.Add(Bar);
             Model.Series.Add(Line);
             
+            
+
+
 
             LinearAxis xAxis = new LinearAxis()
             {
@@ -85,8 +89,9 @@ namespace VoiceСhanging.Models
             {
                 IsAxisVisible = true,
                 Position = AxisPosition.Left,
+                IsPanEnabled = false,
                 MaximumPadding = 1,
-                Minimum = 0,
+                Minimum = -1,
                 Maximum = 1,
                 MajorStep = 5000,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -105,7 +110,8 @@ namespace VoiceСhanging.Models
                 if (RectangleUI == null)
                 {
                     startX = X;
-                    RectangleUI = new RectangleBarItem(startX, -1, X, 1);
+                    RectangleUI = new RectangleBarItem(startX, Int16.MinValue, X, Int16.MaxValue);
+                    RectangleUI.Color = OxyColors.LightGray;
                     Bar.Items.Add(RectangleUI);
                   }
                 else
@@ -119,29 +125,43 @@ namespace VoiceСhanging.Models
 
         private void Model_MouseUp(object sender, OxyMouseEventArgs e)
         {
+            
+            if (RectangleUI != null && isSelected)
+            {
+                if (Math.Abs(RectangleUI.X1 - RectangleUI.X0) < 10)
+                {
+                    ClearBar();
+                    SelectedData.Clear();
+                }
+                else
+                {
+                    double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
+                    double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
+                    SelectedData.AddRange(Line.Points.Where(point => point.X > min && point.X < max));
+                }
+            }
             isSelected = false;
-            //Bar.Items.Clear();
-            //    RectangleUI = null;
-            //   Model.InvalidatePlot(true);
+
         }
 
         private void Model_MouseDown(object sender, OxyMouseDownEventArgs e)
         {
-            if ((GetAsyncKeyState(System.Windows.Forms.Keys.LButton) & 0x8000) != 0)
+            if (IsLeftMousePressed())
             {
                 isSelected = true;
-                if (RectangleUI != null)
-                {
-                    Bar.Items.Clear();
-                    RectangleUI = null;
-                    Model.InvalidatePlot(true);
-                }
+                SelectedData.Clear();
+                if (RectangleUI != null) ClearBar();
             }
 
-           
-
-
         }
+
+        private void ClearBar()
+        {
+            Bar.Items.Clear();
+            RectangleUI = null;
+            Model.InvalidatePlot(true);
+        }
+
 
         private void DefaultData(List<DataPoint> points)
         {
@@ -151,5 +171,12 @@ namespace VoiceСhanging.Models
             }
            
         }
+
+
+        private bool IsLeftMousePressed()
+        {
+            return ((GetAsyncKeyState(System.Windows.Forms.Keys.LButton) & 0x8000) != 0) ? true : false;
+        }
+
     }
 }
