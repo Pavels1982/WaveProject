@@ -6,7 +6,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:VoiceСhanging"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="650" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
@@ -27,11 +27,17 @@
                     Maximum="50000"
                     Width="150" 
                     Value="{Binding ChartModel.Width}"/>
+                <TextBlock Text="{Binding Processed.Header.SampleRate}"/>
+                <TextBlock Text="{Binding ChartModel.X}" Margin="50 0 0 0"/>
             </StackPanel>
 
             <oxy:PlotView 
             Model="{Binding ChartModel.Model}"
-            Height="350"
+            Height="285"
+            />
+            <oxy:PlotView 
+            Model="{Binding FFT.Model}"
+            Height="285"
             />
         </StackPanel>
     </Grid>

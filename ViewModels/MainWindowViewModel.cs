@@ -33,8 +33,10 @@ namespace VoiceСhanging.ViewModels
         }
 
         public ChartModel ChartModel { get; set; } = new ChartModel();
-        private short[] amplData;
-        private WavData processed;
+
+        public ChartModel FFT { get; set; } = new ChartModel();
+
+        public WavData Processed { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -52,9 +54,10 @@ namespace VoiceСhanging.ViewModels
 
             WavFile file = new WavFile(openFileDialog.FileName); //входной файл
             WavData orig = file.ReadData();
-            processed = new WavData(orig.Header, orig.Data.Length);
+            Processed = new WavData(orig.Header, orig.Data.Length);
+           
 
-            
+
             using (orig)
             {
                 int c = orig.GetSamplesCount();
@@ -66,6 +69,7 @@ namespace VoiceСhanging.ViewModels
                     float y = orig.ReadNextSample(); //читаем следующий семпл
                     ChartModel.Line.Points.Add(new DataPoint(x++, y));
                 }
+                ChartModel.Model.Axes[0].AbsoluteMaximum = ChartModel.Line.Points.Count();
                 ChartModel.Model.InvalidatePlot(true);
 
 
@@ -75,10 +79,10 @@ namespace VoiceСhanging.ViewModels
         private void SaveDateWave()
         {
 
-                WavFile new_file = new WavFile(@"note.wav"); //выходной файл
-            ChartModel.Line.Points.ForEach(p => processed.WriteSample((float)p.Y));
+            WavFile new_file = new WavFile(@"note.wav"); //выходной файл
+            ChartModel.Line.Points.ForEach(p => Processed.WriteSample((float)p.Y));
 
-            new_file.WriteData(processed);
+            new_file.WriteData(Processed);
 
         }
 

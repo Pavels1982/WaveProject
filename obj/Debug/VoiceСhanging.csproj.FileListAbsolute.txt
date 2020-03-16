@@ -21,3 +21,25 @@ C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\Voic
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\VoiceСhanging.pdb
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\Views\MainWindow.g.cs
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\Views\MainWindow.baml
+D:\Новая папка\Wave\WaveProject\bin\Debug\VoiceСhanging.exe.config
+D:\Новая папка\Wave\WaveProject\bin\Debug\VoiceСhanging.exe
+D:\Новая папка\Wave\WaveProject\bin\Debug\VoiceСhanging.pdb
+D:\Новая папка\Wave\WaveProject\bin\Debug\NAudio.dll
+D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.dll
+D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.Wpf.dll
+D:\Новая папка\Wave\WaveProject\bin\Debug\PropertyChanged.dll
+D:\Новая папка\Wave\WaveProject\bin\Debug\NAudio.xml
+D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.xml
+D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.Wpf.xml
+D:\Новая папка\Wave\WaveProject\bin\Debug\PropertyChanged.xml
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csprojResolveAssemblyReference.cache
+D:\Новая папка\Wave\WaveProject\obj\Debug\Views\MainWindow.g.cs
+D:\Новая папка\Wave\WaveProject\obj\Debug\App.g.cs
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging_MarkupCompile.cache
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging_MarkupCompile.lref
+D:\Новая папка\Wave\WaveProject\obj\Debug\Views\MainWindow.baml
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.g.resources
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.Properties.Resources.resources
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csproj.GenerateResource.Cache
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.exe
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.pdb
