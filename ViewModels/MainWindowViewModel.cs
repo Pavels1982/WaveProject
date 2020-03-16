@@ -16,7 +16,7 @@ using static VoiceСhanging.Models.WaveData;
 namespace VoiceСhanging.ViewModels
 {
 
-    public class MainWindowViewModel:INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         public ICommand OpenFileCommand
         {
@@ -33,14 +33,6 @@ namespace VoiceСhanging.ViewModels
                 return new RelayCommand((o) => SaveDateWave());
             }
         }
-        public ICommand FFTCommand
-        {
-            get
-            {
-                return new RelayCommand((o) => FFTAnalyzing());
-            }
-        }
-
 
         public ChartModel ChartModel { get; set; } = new ChartModel();
 
@@ -50,7 +42,25 @@ namespace VoiceСhanging.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-      
+        public MainWindowViewModel()
+        {
+            ChartModel.SelectDataChanged += ChartModel_SelectDataChanged;
+        }
+
+        private void ChartModel_SelectDataChanged(List<Complex> selectedData)
+        {
+            FFT.Line.Points.Clear();
+           // List<Complex> FFTcom = new List<Complex>(Fourier.NaiveForward(selectedData.ToArray(), FourierOptions.Default).ToList());
+
+            List<Complex> FFTcom = FFTHelper.fft(selectedData.ToArray()).ToList();
+            FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+            int x = 0;
+            FFTcom.ForEach(comp => FFT.Line.Points.Add(new DataPoint(x++, comp.Magnitude)));
+
+            FFT.Model.Axes[0].AbsoluteMaximum = ChartModel.Line.Points.Count();
+            FFT.Model.InvalidatePlot(true);
+        }
+
         private void ReadDataWave()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -96,20 +106,6 @@ namespace VoiceСhanging.ViewModels
 
         }
 
-        private void FFTAnalyzing()
-        {
-            FFT.Line.Points.Clear();
-            List<Complex> FFTcom = FFTHelper.fft(ChartModel.SelectedData.ToArray()).ToList();
-         //   List<Complex> FFTcom = FFTHelper.nfft(FFTcom1.ToArray()).ToList();
-           // List<Complex> FFTcom = new List<Complex>(Fourier.NaiveForward(ChartModel.SelectedData.ToArray(), FourierOptions.Default).ToList());
-            //FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
-            int x = 0;
-            FFTcom.ForEach(comp => FFT.Line.Points.Add(new DataPoint(x++,comp.Imaginary)));
-
-            FFT.Model.Axes[0].AbsoluteMaximum = ChartModel.Line.Points.Count();
-            FFT.Model.InvalidatePlot(true);
-        }
-
-
+     
     }
 }

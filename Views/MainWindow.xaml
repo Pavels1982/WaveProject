@@ -39,11 +39,6 @@
             Model="{Binding FFT.Model}"
             Height="285"
             />
-            <Button 
-                Width="80"
-                HorizontalAlignment="Left"
-                Content="FFT"
-                Command="{Binding FFTCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

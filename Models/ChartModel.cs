@@ -28,7 +28,10 @@ namespace VoiceСhanging.Models
         public List<Complex> SelectedData { get; set; } = new List<Complex>();
         private bool isPanBar = false;
 
+        public event SelectDataHandler SelectDataChanged;
+        public delegate void SelectDataHandler(List<Complex> selectedData);
 
+        private int WindowWidth = 4096;
 
         public int Width
         {
@@ -121,9 +124,9 @@ namespace VoiceСhanging.Models
                     double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                     double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                     // Debug.WriteLine(((int)max - (int)min));
-                    if (((int)max - (int)min) >= 2048)
+                    if (((int)max - (int)min) >= WindowWidth)
                     {
-                        RectangleUI.X1 = RectangleUI.X0 < RectangleUI.X1 ? startX + 2049 : startX - 2049;
+                        RectangleUI.X1 = RectangleUI.X0 < RectangleUI.X1 ? startX + (WindowWidth + 1) : startX - (WindowWidth + 1);
                     }
                     else
                     {
@@ -150,6 +153,7 @@ namespace VoiceСhanging.Models
                     SelectedData.Add(new Complex(p.Y, 0));
                 });
 
+                SelectDataChanged(SelectedData);
                 Model.InvalidatePlot(true);
             }
 
