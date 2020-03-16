@@ -4,7 +4,9 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +25,10 @@ namespace VoiceСhanging.Models
         public int X { get; set; }
         private int startX { get; set; }
         private int width = 5000;
-        public List<DataPoint> SelectedData { get; set; } = new List<DataPoint>();
+        public List<Complex> SelectedData { get; set; } = new List<Complex>();
+        private bool isPanBar = false;
+
+
 
         public int Width
         {
@@ -63,14 +68,10 @@ namespace VoiceСhanging.Models
             Model.MouseUp += Model_MouseUp;
             Model.MouseMove += Model_MouseMove;
 
-
             Line.Color = OxyColor.FromRgb(0, 0, 255);
             Model.Series.Add(Bar);
             Model.Series.Add(Line);
             
-            
-
-
 
             LinearAxis xAxis = new LinearAxis()
             {
@@ -89,7 +90,7 @@ namespace VoiceСhanging.Models
             {
                 IsAxisVisible = true,
                 Position = AxisPosition.Left,
-                IsPanEnabled = false,
+                IsPanEnabled = true,
                 MaximumPadding = 1,
                 Minimum = -1,
                 Maximum = 1,
@@ -113,19 +114,52 @@ namespace VoiceСhanging.Models
                     RectangleUI = new RectangleBarItem(startX, Int16.MinValue, X, Int16.MaxValue);
                     RectangleUI.Color = OxyColors.LightGray;
                     Bar.Items.Add(RectangleUI);
-                  }
+                }
                 else
                 {
-                    RectangleUI.X1 = X;
+                 
+                    double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
+                    double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
+                    // Debug.WriteLine(((int)max - (int)min));
+                    if (((int)max - (int)min) >= 2048)
+                    {
+                        RectangleUI.X1 = RectangleUI.X0 < RectangleUI.X1 ? startX + 2049 : startX - 2049;
+                    }
+                    else
+                    {
+                        RectangleUI.X1 = X;
+                    }
+                       
                 }
 
                 Model.InvalidatePlot(true);
             }
+
+            if (isPanBar)
+            {
+                X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
+
+                double width = RectangleUI.X1 - RectangleUI.X0;
+
+                RectangleUI.X0 = X - (width / 2f);
+                RectangleUI.X1 = (width / 2f) + X;
+                SelectedData.Clear();
+
+                Line.Points.Where(point => point.X > RectangleUI.X0 && point.X < RectangleUI.X1).ToList().ForEach(p =>
+                {
+                    SelectedData.Add(new Complex(p.Y, 0));
+                });
+
+                Model.InvalidatePlot(true);
+            }
+
+
         }
 
         private void Model_MouseUp(object sender, OxyMouseEventArgs e)
         {
-            
+            isPanBar = false;
+
             if (RectangleUI != null && isSelected)
             {
                 if (Math.Abs(RectangleUI.X1 - RectangleUI.X0) < 10)
@@ -137,7 +171,20 @@ namespace VoiceСhanging.Models
                 {
                     double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                     double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
-                    SelectedData.AddRange(Line.Points.Where(point => point.X > min && point.X < max));
+                    RectangleUI = new RectangleBarItem(min, Int16.MinValue, max, Int16.MaxValue);
+                    RectangleUI.Color = OxyColors.LightGray;
+                    Bar.Items.Add(RectangleUI);
+                    Bar.Items.RemoveAt(0);
+
+                   
+
+                    Line.Points.Where(point => point.X > min && point.X < max).ToList().ForEach(p => 
+                    {
+                        SelectedData.Add(new Complex(p.Y, 0));
+                    });
+                    Debug.WriteLine(SelectedData.Count());
+
+
                 }
             }
             isSelected = false;
@@ -148,9 +195,20 @@ namespace VoiceСhanging.Models
         {
             if (IsLeftMousePressed())
             {
-                isSelected = true;
-                SelectedData.Clear();
-                if (RectangleUI != null) ClearBar();
+
+                X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
+
+                if (RectangleUI != null)
+                {
+                        if (X > RectangleUI.X0 && X < RectangleUI.X1) isPanBar = true;
+                }
+
+                if (!isPanBar)
+                {
+                    isSelected = true;
+                    SelectedData.Clear();
+                    if (RectangleUI != null) ClearBar();
+                }
             }
 
         }

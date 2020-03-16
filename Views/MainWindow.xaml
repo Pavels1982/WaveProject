@@ -6,7 +6,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:VoiceСhanging"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="800">
+        Title="MainWindow" Height="660" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
@@ -39,6 +39,11 @@
             Model="{Binding FFT.Model}"
             Height="285"
             />
+            <Button 
+                Width="80"
+                HorizontalAlignment="Left"
+                Content="FFT"
+                Command="{Binding FFTCommand}"/>
         </StackPanel>
     </Grid>
 </Window>
