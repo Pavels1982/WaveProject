@@ -34,9 +34,20 @@ namespace VoiceСhanging.ViewModels
             }
         }
 
+        public ICommand IFFTCommand
+        {
+            get
+            {
+                return new RelayCommand((o) => IFFT());
+            }
+        }
+
+
         public ChartModel ChartModel { get; set; } = new ChartModel();
 
         public ChartModel FFT { get; set; } = new ChartModel();
+        List<Complex> FFTcom;
+        int start=0, end=0;
 
         public WavData Processed { get; set; }
 
@@ -47,18 +58,42 @@ namespace VoiceСhanging.ViewModels
             ChartModel.SelectDataChanged += ChartModel_SelectDataChanged;
         }
 
-        private void ChartModel_SelectDataChanged(List<Complex> selectedData)
-        {
-            FFT.Line.Points.Clear();
-           // List<Complex> FFTcom = new List<Complex>(Fourier.NaiveForward(selectedData.ToArray(), FourierOptions.Default).ToList());
 
-            List<Complex> FFTcom = FFTHelper.fft(selectedData.ToArray()).ToList();
-            FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+        private void IFFT()
+        {
+            int i = this.start;
+            foreach (var p in FFTHelper.IFFT(FFTcom.ToArray()))
+            {
+                ChartModel.Line.Points[i] = new DataPoint(i, p);
+                i++;
+            }
+            ChartModel.Model.InvalidatePlot(true);
+        }
+
+
+
+        private void ChartModel_SelectDataChanged(List<Complex> selectedData, int start, int end)
+        {
+            this.start = start;
+            this.end = end;
+            FFT.Line.Points.Clear();
+            // List<Complex> FFTcom = new List<Complex>(Fourier.NaiveForward(selectedData.ToArray(), FourierOptions.Default).ToList());
+
+            FFTcom = FFTHelper.FFT(selectedData.ToArray()).ToList();
+            // FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+            //int j = (FFTcom.Count - 1);
+            //for (int y = 0; y < 300; y++)
+            //{
+            //    FFTcom[y] = new Complex(0, 0);
+            //    FFTcom[j - y] = new Complex(0, 0);
+            //}
+
             int x = 0;
             FFTcom.ForEach(comp => FFT.Line.Points.Add(new DataPoint(x++, comp.Magnitude)));
 
             FFT.Model.Axes[0].AbsoluteMaximum = ChartModel.Line.Points.Count();
             FFT.Model.InvalidatePlot(true);
+            IFFT();
         }
 
         private void ReadDataWave()

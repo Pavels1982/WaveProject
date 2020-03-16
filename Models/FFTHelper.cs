@@ -50,7 +50,7 @@ namespace VoiceСhanging.Models
         public static Complex[] nfft(Complex[] X)
         {
             int N = X.Length;
-          //  N -= (N % 2);
+            //  N -= (N % 2);
 
             Complex[] X_n = new Complex[N];
             for (int i = 0; i < N / 2; i++)
@@ -60,5 +60,124 @@ namespace VoiceСhanging.Models
             }
             return X_n;
         }
-    }
+  
+
+
+
+        /// <summary>
+        /// Функция быстрого преобразования Фурье для комплексного массива
+        /// </summary>
+        /// <param name="f">исходный комплексный массив</param>
+        /// <returns>спектр массива</returns>
+        public static Complex[] FFT(Complex[] f)
+        {
+            int N = f.Length;
+            Complex[] F = new Complex[N];
+            Complex[] o, O, e, E;
+            if (N == 1)
+            {
+                F[0] = f[0];
+                return F;
+            }
+            e = new Complex[N / 2];
+            o = new Complex[N / 2];
+            for (int i = 0; i < N / 2; i++)
+            {
+                e[i] = f[2 * i];
+                o[i] = f[2 * i + 1];
+            }
+            O = FFT(o);
+            E = FFT(e);
+            for (int i = 0; i < N / 2; i++)
+            {
+                O[i] *= from_polar(1, -2 * Math.PI * i / N);
+            }
+            for (int i = 0; i < N / 2; i++)
+            {
+                F[i] = E[i] + O[i];
+                F[i + N / 2] = E[i] - O[i];
+            }
+            return F;
+        }
+
+        /// <summary>
+        /// Функция получения комплексного числа
+        /// по полярным координатам
+        /// </summary>
+        /// <param name="r">модуль числа</param>
+        /// <param name="arg">аргумент числа</param>
+        /// <returns>комплексное число</returns>
+        public static Complex from_polar(double r, double arg)
+        {
+            return new Complex(r * Math.Cos(arg), r * Math.Sin(arg));
+        }
+
+
+        /// <summary>
+        /// Функция обратного преобразования Фурье с действительным результатом
+        /// </summary>
+        /// <param name="F">спектр Фурье</param>
+        /// <returns>действительныймассив, восстановленный по спектру</returns>
+        public static double[] IFFT(Complex[] F)
+        {
+            int N = F.Length;
+            Complex[] f = IFFTc(F);
+            double[] res = new double[N];
+            for (int i = 0; i < N; i++)
+            {
+                res[i] = (f[i].Real + f[i].Imaginary) / N;
+            }
+            return res;
+        }
+
+
+
+        /// <summary>
+        /// Функция обратного преобразования Фурье с комплексным результатом
+        /// </summary>
+        /// <param name="F">спектр Фурье</param>
+        /// <returns>комплексный, восстановленный по спектру</returns>
+        public static Complex[] IFFTc(Complex[] F)
+        {
+            int N = F.Length;
+            Complex[] f = new Complex[N];
+            Complex[] o, O, e, E;
+            if (N == 1)
+            {
+                f[0] = F[0];
+                return f;
+                
+            }
+            e = new Complex[N / 2];
+            o = new Complex[N / 2];
+            for (int i = 0; i < N / 2; i++)
+            {
+                e[i] = conjugate(F[2 * i]);
+                o[i] = conjugate(F[2 * i + 1]);
+            }
+            O = FFT(o);
+            E = FFT(e);
+            for (int i = 0; i < N / 2; i++)
+            {
+                O[i] *= from_polar(1, -2 * Math.PI * i / N);
+            }
+            for (int i = 0; i < N / 2; i++)
+            {
+                f[i] = conjugate(E[i] + O[i]);
+                f[i + N / 2] = conjugate(E[i] - O[i]);
+            }
+            return f;
+        }
+
+        /// <summary>
+        /// Функция комплексного сопряжения
+        /// </summary>
+        /// <param name="a">комплексное число</param>
+        /// <returns>сопряжённое число</returns>
+        public static Complex conjugate(Complex a)
+        {
+            return new Complex(a.Real, -a.Imaginary);
+        }
+
+    }
 }

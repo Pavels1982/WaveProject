@@ -6,7 +6,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:VoiceСhanging"
         mc:Ignorable="d"
-        Title="MainWindow" Height="660" Width="800">
+        Title="MainWindow" Height="680" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
@@ -39,6 +39,15 @@
             Model="{Binding FFT.Model}"
             Height="285"
             />
+            <StackPanel Orientation="Horizontal">
+                <Slider 
+                    HorizontalAlignment="Left"
+                    Background="Gray"
+                    Maximum="50000"
+                    Width="150" 
+                    Value="{Binding FFT.Width}"/>
+                <Button Content="Обратное преобразование" Command="{Binding IFFTCommand}"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

@@ -45,3 +45,5 @@ D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.exe
 D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.pdb
 D:\Новая папка\Wave\WaveProject\bin\Debug\MathNet.Numerics.dll
 D:\Новая папка\Wave\WaveProject\bin\Debug\MathNet.Numerics.xml
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\bin\Debug\MathNet.Numerics.dll
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\bin\Debug\MathNet.Numerics.xml
