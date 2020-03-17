@@ -73,6 +73,11 @@ namespace VoiceСhanging.Models
                 }
                 return X_n;
             }
-    
+
+
+
+
+      
+
     }
 }

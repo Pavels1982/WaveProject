@@ -180,6 +180,37 @@ namespace VoiceСhanging.Models
             return new Complex(a.Real, -a.Imaginary);
         }
 
+        public static double Hamming(double n, double frameSize)
+        {
+            return 0.54 - 0.46 * Math.Cos((2 * Math.PI * n) / (frameSize - 1));
+        }
+
+        public static double Hann(double n, double frameSize)
+        {
+            return 0.5 * (1 - Math.Cos((2 * Math.PI * n) / (frameSize - 1)));
+        }
+
+        public static double BlackmannHarris(double n, double frameSize)
+        {
+            return 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * n) / (frameSize - 1))) +
+                   (0.14128 * Math.Cos((4 * Math.PI * n) / (frameSize - 1))) - (0.01168 * Math.Cos((4 * Math.PI * n) / (frameSize - 1)));
+        }
+
+
+        /// <summary>
+        /// Функция окна Хэннинга
+        /// </summary>
+        /// <param name="windowsize">длина фрейма для окна</param>
+        /// <returns>массив со значениями оконной функции</returns>
+        public static double[] hanning(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int t = 0; t < windowsize; t++)
+            {
+                w[t] = 0.54 - 0.46 * Math.Cos(2 * Math.PI * t / windowsize);
+            }
+            return w;
+        }
 
 
     }

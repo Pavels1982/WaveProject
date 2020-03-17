@@ -18,6 +18,7 @@
         </Grid.ColumnDefinitions>
        
         <StackPanel 
+            Margin="0 50 0 0"
             Grid.Column="0"
             Grid.Row="0"
             Orientation="Horizontal">
@@ -31,37 +32,44 @@
                 HorizontalAlignment="Left"
                 Content="Save"
                 Command="{Binding WriteFileCommand}"/>
+           
+
+        </StackPanel>
+
+       
+
+
+        <StackPanel
+            Grid.Column="0"
+            Grid.Row="1"
+            Orientation="Vertical">
+            <oxy:PlotView 
+            Model="{Binding Model}"
+            Height="285"
+            />
             <Slider
                 Value="{Binding Width}"
                 Maximum="100000"
                 Width="200"
                 Foreground="Gray"
                 />
-
         </StackPanel>
 
-        <Slider
+        <StackPanel 
             Grid.Column="1"
-            Grid.Row="0"
+            Grid.Row="1"
+            Orientation="Vertical">
+            <oxy:PlotView 
+            Model="{Binding FFTModel}"
+            Height="285"
+            />
+            <Slider
             Value="{Binding FFTWidth}"
             Maximum="2048"
             Width="200"
            Foreground="Gray"
                 />
-
-
-        <oxy:PlotView 
-            Grid.Column="0"
-            Grid.Row="1"
-            Model="{Binding Model}"
-            Height="285"
-            />
-        <oxy:PlotView 
-            Grid.Column="1"
-            Grid.Row="1"
-            Model="{Binding FFTModel}"
-            Height="285"
-            />
+        </StackPanel>
 
 
     </Grid>

@@ -139,7 +139,7 @@ namespace VoiceСhanging.Models
            // FFTModel.Series.Add(Bar);
             FFTModel.Series.Add(FFTLine);
 
-            Func<double, string> str = (Label =>   (Label * 22f).ToString()+ "Hz" );
+            Func<double, string> str = (Label =>   (Label * 22f).ToString());
 
             LinearAxis xAxis = new LinearAxis()
             {
@@ -148,7 +148,7 @@ namespace VoiceСhanging.Models
                 MajorStep = 50,
                 IsZoomEnabled = false,
                 Maximum = this.Width,
-                AbsoluteMaximum = 1025,
+                AbsoluteMaximum = 2049,
                 AbsoluteMinimum = 0,
                 LabelFormatter = str,
 
@@ -282,17 +282,50 @@ namespace VoiceСhanging.Models
         private void SelectDataChanged(List<Complex> selectedData, int start)
         {
             FFTLine.Points.Clear();
-            FFTcom = FFTHelper.FFT(selectedData.ToArray()).ToList();
-         // FFTcom = FFT2Helper.fft(FFT2Helper.fft(selectedData.ToArray())).ToList();
+            // FFTcom = FFTHelper.FFT(selectedData.ToArray()).ToList();
+            FFTcom = FFT2Helper.fft(selectedData.ToArray()).ToList();
 
-            FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+            //int freq = 100;
+            //int freqWidth = 50;
+            //int shift = 50;
 
+            //Complex[] temp = FFTcom.ToArray();
+            //FFTcom.GetRange(freq, freqWidth).CopyTo(temp, freq + shift);
+
+            //FFTcom.GetRange((FFTcom.Count() - 1) - freq - freqWidth, freqWidth).CopyTo(temp, (FFTcom.Count() - 1) - freq - freqWidth - shift);
+
+
+            //FFTcom = temp.ToList();
+
+            //for (int i = freq; i < freq + shift; i++)
+            //{
+            //    FFTcom[i] = new Complex(0, 0);
+            //    FFTcom[FFTcom.Count()-1 - i] = new Complex(0, 0);
+
+
+            //}
+
+
+
+            //  FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
+            double[] han = FFTHelper.hanning(FFTcom.Count());
             int x = 0;
             FFTcom.ForEach(comp =>
             {
                 //FFTLine.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
-                //   FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
-                FFTLine.Points.Add(new DataPoint(x++,  comp.Magnitude));
+                //FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
+
+                  FFTLine.Points.Add(new DataPoint(x, comp.Magnitude));
+                x++;
+                //Окно Хамминга в ДБ
+                // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));
+                //FFTLine.Points.Add(new DataPoint(x++, FFTHelper.Hamming(comp.Magnitude, 1000)));
+
+                //Магнитуда в  ДБ
+                // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));
+                //  FFTLine.Points.Add(new DataPoint(x++, magnitude_dB - 90));
+
+
             }
 
             );
@@ -300,7 +333,7 @@ namespace VoiceСhanging.Models
             //FFTModel.Axes[0].MaximumRange = FFTcom.Count;
             //FFTModel.Axes[0].MinimumRange = FFTcom.Count;
             FFTModel.InvalidatePlot(true);
-           //  IFFT(start);
+          //  IFFT(start);
         }
 
         private void IFFT(int start)
