@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 D:\Новая папка\Wave\WaveProject\App.xaml
-11892971807
+21335771655
 
-161889143244
+18-1421421106
 23899080878
-Views\MainWindow.xaml;
+UserControls\ChartView.xaml;Views\MainWindow.xaml;
 
-False
+True
 

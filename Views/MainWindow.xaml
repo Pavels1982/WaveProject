@@ -5,49 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:VoiceСhanging"
+        xmlns:controls="clr-namespace:VoiceСhanging.UserControls"
         mc:Ignorable="d"
         Title="MainWindow" Height="680" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <Button 
-                Width="80"
-                HorizontalAlignment="Left"
-                Content="Open..."
-                Command="{Binding OpenFileCommand}"/>
-                <Button 
-                Width="80"
-                HorizontalAlignment="Left"
-                Content="Save"
-                Command="{Binding WriteFileCommand}"/>
-            </StackPanel>
+            <controls:ChartView DataContext="{Binding Model1}"/>
+            <controls:ChartView DataContext="{Binding Model2}"/>
 
-            <StackPanel Orientation="Horizontal">
-                <Slider 
-                    Maximum="50000"
-                    Width="150" 
-                    Value="{Binding ChartModel.Width}"/>
-                <TextBlock Text="{Binding Processed.Header.SampleRate}"/>
-                <TextBlock Text="{Binding ChartModel.X}" Margin="50 0 0 0"/>
-            </StackPanel>
-
-            <oxy:PlotView 
-            Model="{Binding ChartModel.Model}"
-            Height="285"
-            />
-            <oxy:PlotView 
-            Model="{Binding FFT.Model}"
-            Height="285"
-            />
-            <StackPanel Orientation="Horizontal">
-                <Slider 
-                    HorizontalAlignment="Left"
-                    Background="Gray"
-                    Maximum="50000"
-                    Width="150" 
-                    Value="{Binding FFT.Width}"/>
-                <Button Content="Обратное преобразование" Command="{Binding IFFTCommand}"/>
-            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

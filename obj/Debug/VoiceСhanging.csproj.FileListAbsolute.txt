@@ -32,7 +32,6 @@ D:\Новая папка\Wave\WaveProject\bin\Debug\NAudio.xml
 D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.xml
 D:\Новая папка\Wave\WaveProject\bin\Debug\OxyPlot.Wpf.xml
 D:\Новая папка\Wave\WaveProject\bin\Debug\PropertyChanged.xml
-D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csprojResolveAssemblyReference.cache
 D:\Новая папка\Wave\WaveProject\obj\Debug\Views\MainWindow.g.cs
 D:\Новая папка\Wave\WaveProject\obj\Debug\App.g.cs
 D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging_MarkupCompile.cache
@@ -47,3 +46,7 @@ D:\Новая папка\Wave\WaveProject\bin\Debug\MathNet.Numerics.dll
 D:\Новая папка\Wave\WaveProject\bin\Debug\MathNet.Numerics.xml
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\bin\Debug\MathNet.Numerics.dll
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\bin\Debug\MathNet.Numerics.xml
+D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartView.g.cs
+D:\Новая папка\Wave\WaveProject\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartView.baml
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csprojResolveAssemblyReference.cache

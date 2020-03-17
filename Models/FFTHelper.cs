@@ -128,7 +128,8 @@ namespace VoiceСhanging.Models
                 res[i] = (f[i].Real + f[i].Imaginary) / N;
             }
             return res;
-        }
+        }
+
 
 
 
@@ -177,7 +178,11 @@ namespace VoiceСhanging.Models
         public static Complex conjugate(Complex a)
         {
             return new Complex(a.Real, -a.Imaginary);
-        }
+        }
 
-    }
+
+
+    }
+
+
 }
