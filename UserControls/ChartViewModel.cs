@@ -148,7 +148,7 @@ namespace VoiceСhanging.Models
                 MajorStep = 50,
                 IsZoomEnabled = false,
                 Maximum = this.Width,
-                AbsoluteMaximum = 2049,
+                AbsoluteMaximum = 1025,
                 AbsoluteMinimum = 0,
                 LabelFormatter = str,
 
@@ -230,7 +230,7 @@ namespace VoiceСhanging.Models
                 }
                 else
                 {
-                 
+
                     double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                     double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                     // Debug.WriteLine(((int)max - (int)min));
@@ -242,7 +242,7 @@ namespace VoiceСhanging.Models
                     {
                         RectangleUI.X1 = X;
                     }
-                       
+
                 }
 
                 Model.InvalidatePlot(true);
@@ -260,9 +260,11 @@ namespace VoiceСhanging.Models
                 //  X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
 
                 double width = RectangleUI.X1 - RectangleUI.X0;
-
-                RectangleUI.X0 = X - (width / 2f);
-                RectangleUI.X1 = (width / 2f) + X;
+                int offset = X - LastX;
+              //  RectangleUI.X0 = X - (width / 2f);
+               // RectangleUI.X1 = (width / 2f) + X;
+                RectangleUI.X0 += offset;
+                RectangleUI.X1 += offset;
                 SelectedData.Clear();
                 int px = -1;
                 Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
@@ -272,7 +274,7 @@ namespace VoiceСhanging.Models
                 });
 
                 SelectDataChanged(SelectedData, px);
-                LastX = (int)RectangleUI.X0;
+                LastX = X;
                 Model.InvalidatePlot(true);
             }
 
@@ -412,7 +414,11 @@ namespace VoiceСhanging.Models
 
                 if (RectangleUI != null)
                 {
-                        if (X > RectangleUI.X0 && X < RectangleUI.X1) isPanBar = true;
+                    if (X > RectangleUI.X0 && X < RectangleUI.X1) 
+                    { 
+                        isPanBar = true;
+                        LastX = X;
+                    }
                 }
 
                 if (!isPanBar)

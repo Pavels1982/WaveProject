@@ -50,3 +50,6 @@ D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartView.g.cs
 D:\Новая папка\Wave\WaveProject\obj\Debug\GeneratedInternalTypeHelper.g.cs
 D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartView.baml
 D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csprojResolveAssemblyReference.cache
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartView.g.cs
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartView.baml

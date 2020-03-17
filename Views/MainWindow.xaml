@@ -9,10 +9,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="680" Width="800">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <controls:ChartView DataContext="{Binding Model1}"/>
-            <controls:ChartView DataContext="{Binding Model2}"/>
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical">
+                <controls:ChartView DataContext="{Binding Model1}"/>
+                <controls:ChartView DataContext="{Binding Model2}"/>
+                <controls:ChartView DataContext="{Binding Model3}"/>
 
-        </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

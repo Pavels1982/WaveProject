@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace VoiceСhanging.Models
 {
+    /// <summary>
+    /// Классическая реализация FFT
+    /// </summary>
     public static class FFT2Helper
     {
 
