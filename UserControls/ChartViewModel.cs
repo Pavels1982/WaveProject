@@ -32,6 +32,8 @@ namespace VoiceСhanging.Models
         public int X { get; set; }
         public int LastX { get; set; }
 
+        public bool IsMagnitude { get; set; } = false;
+
         private int bindX;
         public int BindX
         {
@@ -317,7 +319,7 @@ namespace VoiceСhanging.Models
                 //FFTLine.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
                 //FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
 
-                  FFTLine.Points.Add(new DataPoint(x, comp.Magnitude));
+                  FFTLine.Points.Add(new DataPoint(x, IsMagnitude ? GetYPosLog(comp.Magnitude):comp.Magnitude));
                 x++;
                 //Окно Хамминга в ДБ
                 // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));
@@ -360,11 +362,13 @@ namespace VoiceСhanging.Models
             // not entirely sure whether the multiplier should be 10 or 20 in this case.
             // going with 10 from here http://stackoverflow.com/a/10636698/7532
             double intensityDB = 10 * Math.Log10(Math.Sqrt(c.Real * c.Real + c.Imaginary * c.Imaginary));
+           // double intensityDB = 10 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
+            // double intensityDB = 10 * Math.Log((c.Real * c.Real) / (c.Imaginary * c.Imaginary));
             double minDB = -90;
             if (intensityDB < minDB) intensityDB = minDB;
             double percent = intensityDB / minDB;
             // we want 0dB to be at the top (i.e. yPos = 0)
-            double yPos = percent;
+            double yPos = intensityDB;
             return yPos;
         }
 

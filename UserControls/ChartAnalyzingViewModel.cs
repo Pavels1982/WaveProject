@@ -32,11 +32,11 @@ namespace VoiceСhanging.UserControls
             private bool isSelected = false;
             public int X { get; set; }
             public int LastX { get; set; }
+            public bool IsMagnitude { get; set; } = false;
 
-    
-          
 
-            private int startX { get; set; }
+
+        private int startX { get; set; }
             private int width = 5000;
             public List<Complex> SelectedData { get; set; } = new List<Complex>();
             private bool isPanBar = false;
@@ -88,6 +88,15 @@ namespace VoiceСhanging.UserControls
 
 
             #region Command
+
+            public ICommand MorphingCommand
+        {
+            get
+            {
+                return new RelayCommand((o) => Morphing());
+            }
+        }
+
             public ICommand OpenFileCommand
             {
                 get
@@ -286,10 +295,10 @@ namespace VoiceСhanging.UserControls
 
             private double GetYPosLog(Complex c)
             {
-                // not entirely sure whether the multiplier should be 10 or 20 in this case.
-                // going with 10 from here http://stackoverflow.com/a/10636698/7532
-                double intensityDB = 10 * Math.Log10(Math.Sqrt(c.Real * c.Real + c.Imaginary * c.Imaginary));
-                double minDB = -90;
+            // not entirely sure whether the multiplier should be 10 or 20 in this case.
+            // going with 10 from here http://stackoverflow.com/a/10636698/7532
+            double intensityDB = 10 * Math.Log10(Math.Sqrt(c.Real * c.Real + c.Imaginary * c.Imaginary));
+            double minDB = -90;
                 if (intensityDB < minDB) intensityDB = minDB;
                 double percent = intensityDB / minDB;
                 // we want 0dB to be at the top (i.e. yPos = 0)
@@ -325,7 +334,14 @@ namespace VoiceСhanging.UserControls
                             SelectedData.Add(new Complex(p.Y, 0));
                         });
                         LastX = (int)min;
-                     
+
+                    if (!IsMagnitude)
+                    {
+                        Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+                    }
+                    else
+                        Morphing();
+                   
 
 
                     }
@@ -385,10 +401,91 @@ namespace VoiceСhanging.UserControls
             }
 
 
-            private void ReadDataWave()
+        class Val
+        {
+            public double Magnitude { get; set; } = 0;
+            public int Rep { get; set; } = 0;
+        }
+
+
+        private void Process(int start, int end)
+        {
+            FFTLine.Points.Clear();
+            List<Val> temp = new List<Val>(2048);
+
+            double[] result = new double[2048];
+            result.ToList().ForEach(r => temp.Add(new Val()));
+
+
+            for (int x = 0; x < SelectedData.Count() - 2048; x += 5)
+            {
+                int i = 0;
+                if (x + 2048 < SelectedData.Count() - 2048)
+                    FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray()).ToList().ForEach(p =>
+                    {
+                        if (p.Magnitude > 100f)
+                        {
+                            temp[i].Magnitude = p.Magnitude;
+                            temp[i].Rep++;
+                        }
+                        i++;
+                    });
+            }
+
+            for (int i = 0; i < 2048; i++)
+            {
+                temp[i].Magnitude = temp[i].Rep > 60 ? (temp[i].Magnitude / temp[i].Rep)*80 : 0;
+                FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
+            }
+
+            FFTModel.InvalidatePlot(true);
+
+        }
+
+        private void Morphing()
+        {
+            int startPos = (int)RectangleUI.X0;
+            DataPoint[] res = new DataPoint[SelectedData.Count() - 2048];
+            for (int x = 0; x < SelectedData.Count() - 2048; x += 10)
+            {
+
+                if (x + 2048 < SelectedData.Count() - 2048)
+                {
+                    Complex[] tempFFT = FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray());
+
+                 //   Complex[] tempIFFT = new Complex[2048];
+                    for (int i1 = 0; i1 < 2048; i1++)
+                    {
+
+                        // tempIFFT[i1] = FFTLine.Points[i1].Y;
+                        // tempIFFT[i1] =new  Complex(0, 0);
+                        if (tempFFT[i1].Magnitude < FFTLine.Points[i1].Y)
+                        {
+                            tempFFT[i1] = new Complex(0, 0);
+                        }
+                        else
+                        {
+                            tempFFT[i1] = FFTLine.Points[i1].Y;
+                        }
+
+                    }
+                    FFTHelper.IFFT(tempFFT).ToList().ForEach(e => res[x]  = new DataPoint(x + (Line.Points.Count-1), e) );
+                   
+                }
+            }
+            Line.Points.AddRange(res.ToList());
+            Model.InvalidatePlot(true);
+
+
+        }
+
+
+
+        #region DataReadWriteBlock
+        private void ReadDataWave()
             {
                 System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "All Supported Files (*.wav;*.mp3)|*.wav;*.mp3";
+                openFileDialog.Filter = "All Supported Files (*.wav)|*.wav";
                 if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
                 {
                     return;
@@ -399,7 +496,6 @@ namespace VoiceСhanging.UserControls
                 WavData orig = file.ReadData();
                 Processed = new WavData(orig.Header, orig.Data.Length);
                 SelectedData.Clear();
-                FFTLine.Points.Clear();
                 Line.Points.Clear();
 
                 using (orig)
@@ -418,8 +514,7 @@ namespace VoiceСhanging.UserControls
                 }
             }
 
-
-            private void SaveDateWave()
+        private void SaveDateWave()
             {
 
                 WavFile new_file = new WavFile(FileName.Remove(FileName.Length - 4) + "-Modify.wav"); //выходной файл
@@ -428,6 +523,7 @@ namespace VoiceСhanging.UserControls
                 new_file.WriteData(Processed);
 
             }
+        #endregion
 
 
     }

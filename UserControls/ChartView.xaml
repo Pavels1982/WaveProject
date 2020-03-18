@@ -32,7 +32,8 @@
                 HorizontalAlignment="Left"
                 Content="Save"
                 Command="{Binding WriteFileCommand}"/>
-           
+            
+
 
         </StackPanel>
 
@@ -71,6 +72,11 @@
             Width="200"
            Foreground="Gray"
                 />
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding IsMagnitude}"/>
+                <TextBlock Text="Децибелы"/>
+            </StackPanel>
+
         </StackPanel>
 
 
