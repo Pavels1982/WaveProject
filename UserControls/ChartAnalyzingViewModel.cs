@@ -234,18 +234,24 @@ namespace VoiceСhanging.UserControls
 
                 if (isPanBar && RectangleUI != null)
                 {
-                    double width = RectangleUI.X1 - RectangleUI.X0;
-                    int offset = X - LastX;
+                //double width = RectangleUI.X1 - RectangleUI.X0;
+                double width = 2048;
+                int offset = X - LastX;
                 //RectangleUI.X0 = X - (width / 2f);
                 //RectangleUI.X1 = (width / 2f) + X;
                 RectangleUI.X0 += offset;
                 RectangleUI.X1 += offset;
                 SelectedData.Clear();
-                    int px = -1;
-                    Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
+                double[] han = FFTHelper.blackmannHarris((int)width);
+                int px = -1;
+                int i = 0;
+                Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
                     {
                         if (px == -1) px = (int)p.X;
-                        SelectedData.Add(new Complex(p.Y, 0));
+                       
+                        double pY = IsMagnitude ? p.Y* han[i] : p.Y;
+                        SelectedData.Add(new Complex(pY, 0));
+                        if (i < width-1) i++;
                     });
 
                 //  SelectDataChanged(SelectedData, px);
@@ -276,10 +282,10 @@ namespace VoiceСhanging.UserControls
 
             }
 
-            private void IFFT(int start)
+            private void IFFT(Complex[] source, int start)
             {
                 int i = start;
-                foreach (var p in FFTHelper.IFFT(FFTcom.ToArray()))
+                foreach (var p in FFTHelper.IFFT(source))
                 {
                     Line.Points[i] = new DataPoint(i, p);
                     i++;
@@ -417,24 +423,23 @@ namespace VoiceСhanging.UserControls
             result.ToList().ForEach(r => temp.Add(new Val()));
 
 
-            for (int x = 0; x < SelectedData.Count() - 2048; x += 5)
+            for (int x = 0; x < SelectedData.Count() - 2048; x += 250)
             {
                 int i = 0;
                 if (x + 2048 < SelectedData.Count() - 2048)
                     FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray()).ToList().ForEach(p =>
                     {
-                        if (p.Magnitude > 100f)
-                        {
-                            temp[i].Magnitude = p.Magnitude;
+
+                            temp[i].Magnitude += p.Magnitude;
                             temp[i].Rep++;
-                        }
                         i++;
                     });
             }
 
             for (int i = 0; i < 2048; i++)
             {
-                temp[i].Magnitude = temp[i].Rep > 60 ? (temp[i].Magnitude / temp[i].Rep)*80 : 0;
+                temp[i].Magnitude = (temp[i].Magnitude / 2048);
+               // temp[i].Magnitude = temp[i].Rep > cons ? (temp[i].Magnitude / temp[i].Rep) : 0;
                 FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
             }
 
@@ -446,34 +451,44 @@ namespace VoiceСhanging.UserControls
         {
             int startPos = (int)RectangleUI.X0;
             DataPoint[] res = new DataPoint[SelectedData.Count() - 2048];
-            for (int x = 0; x < SelectedData.Count() - 2048; x += 10)
+            for (int x = 0; x < SelectedData.Count() - 2048; x += 256)
             {
 
                 if (x + 2048 < SelectedData.Count() - 2048)
                 {
                     Complex[] tempFFT = FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray());
 
-                 //   Complex[] tempIFFT = new Complex[2048];
+                    //   Complex[] tempIFFT = new Complex[2048];
+                    int index = 100;
+                    
+
+
                     for (int i1 = 0; i1 < 2048; i1++)
                     {
 
-                        // tempIFFT[i1] = FFTLine.Points[i1].Y;
-                        // tempIFFT[i1] =new  Complex(0, 0);
-                        if (tempFFT[i1].Magnitude < FFTLine.Points[i1].Y)
-                        {
-                            tempFFT[i1] = new Complex(0, 0);
-                        }
-                        else
-                        {
-                            tempFFT[i1] = FFTLine.Points[i1].Y;
-                        }
+
+                        tempFFT[index] = tempFFT[20];
+
+                        tempFFT[2047 - index] = tempFFT[index];
+
+
+                        //// tempIFFT[i1] = FFTLine.Points[i1].Y;
+                        //// tempIFFT[i1] =new  Complex(0, 0);
+                        //if (tempFFT[i1].Magnitude < FFTLine.Points[i1].Y)
+                        //{
+                        //    tempFFT[i1] = new Complex(0, 0);
+                        //}
+                        //else
+                        //{
+                        //    tempFFT[i1] = FFTLine.Points[i1].Y;
+                        //}
 
                     }
-                    FFTHelper.IFFT(tempFFT).ToList().ForEach(e => res[x]  = new DataPoint(x + (Line.Points.Count-1), e) );
-                   
+                    //FFTHelper.IFFT(tempFFT).ToList().ForEach(e => res[x]  = new DataPoint(x + (Line.Points.Count-1), e) );
+                    IFFT(tempFFT, startPos + x);
                 }
             }
-            Line.Points.AddRange(res.ToList());
+          //  Line.Points.AddRange(res.ToList());
             Model.InvalidatePlot(true);
 
 

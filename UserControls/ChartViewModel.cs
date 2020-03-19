@@ -261,18 +261,23 @@ namespace VoiceСhanging.Models
 
                 //  X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
 
-                double width = RectangleUI.X1 - RectangleUI.X0;
+                
                 int offset = X - LastX;
               //  RectangleUI.X0 = X - (width / 2f);
                // RectangleUI.X1 = (width / 2f) + X;
                 RectangleUI.X0 += offset;
                 RectangleUI.X1 += offset;
+                double width = RectangleUI.X1 - RectangleUI.X0;
                 SelectedData.Clear();
                 int px = -1;
-                Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
+                double[] han = FFTHelper.blackmannHarris(2048);
+                int i = 0;
+                Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X < RectangleUI.X1).ToList().ForEach(p =>
                 {
                     if (px == -1) px = (int)p.X;
-                    SelectedData.Add(new Complex(p.Y, 0));
+                    double pY = IsMagnitude? p.Y * han[i]: p.Y;
+                    SelectedData.Add(new Complex(pY, 0));
+                    if (i < 2047) i++;
                 });
 
                 SelectDataChanged(SelectedData, px);
@@ -318,8 +323,8 @@ namespace VoiceСhanging.Models
             {
                 //FFTLine.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
                 //FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
-
-                  FFTLine.Points.Add(new DataPoint(x, IsMagnitude ? GetYPosLog(comp.Magnitude):comp.Magnitude));
+                FFTLine.Points.Add(new DataPoint(x, comp.Magnitude));
+               // FFTLine.Points.Add(new DataPoint(x, IsMagnitude ? GetYPosLog(comp.Magnitude) : comp.Magnitude));
                 x++;
                 //Окно Хамминга в ДБ
                 // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));

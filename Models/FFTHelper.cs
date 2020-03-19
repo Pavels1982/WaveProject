@@ -213,6 +213,35 @@ namespace VoiceСhanging.Models
         }
 
 
+        public static double[] hann(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int t = 0; t < windowsize; t++)
+            {
+                w[t] = 0.5 * (1 - Math.Cos((2 * Math.PI * t) / (windowsize - 1)));
+
+            }
+            return w;
+        }
+
+        public static double[] blackmannHarris(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int t = 0; t < windowsize; t++)
+            {
+                w[t] = 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * t) / (windowsize - 1))) +
+                   (0.14128 * Math.Cos((4 * Math.PI * t) / (windowsize - 1))) - (0.01168 * Math.Cos((4 * Math.PI * t) / (windowsize - 1)));
+
+            }
+            return w;
+
+
+        
+        }
+
+
+
+
     }
 
 
