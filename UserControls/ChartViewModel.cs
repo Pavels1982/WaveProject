@@ -270,14 +270,15 @@ namespace VoiceСhanging.Models
                 double width = RectangleUI.X1 - RectangleUI.X0;
                 SelectedData.Clear();
                 int px = -1;
-                double[] han = FFTHelper.blackmannHarris(2048);
+                double[] han = FFTHelper.BartlettWindow(1000);
+                //double[] han = FFTHelper.hanning(2048);
                 int i = 0;
                 Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X < RectangleUI.X1).ToList().ForEach(p =>
                 {
                     if (px == -1) px = (int)p.X;
                     double pY = IsMagnitude? p.Y * han[i]: p.Y;
                     SelectedData.Add(new Complex(pY, 0));
-                    if (i < 2047) i++;
+                    if (i < 999) i++;
                 });
 
                 SelectDataChanged(SelectedData, px);
@@ -317,7 +318,7 @@ namespace VoiceСhanging.Models
 
 
             //  FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
-            double[] han = FFTHelper.hanning(FFTcom.Count());
+            double[] han = FFTHelper.Hamming(FFTcom.Count());
             int x = 0;
             FFTcom.ForEach(comp =>
             {

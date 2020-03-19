@@ -180,63 +180,108 @@ namespace VoiceСhanging.Models
             return new Complex(a.Real, -a.Imaginary);
         }
 
-        public static double Hamming(double n, double frameSize)
-        {
-            return 0.54 - 0.46 * Math.Cos((2 * Math.PI * n) / (frameSize - 1));
-        }
-
-        public static double Hann(double n, double frameSize)
-        {
-            return 0.5 * (1 - Math.Cos((2 * Math.PI * n) / (frameSize - 1)));
-        }
-
-        public static double BlackmannHarris(double n, double frameSize)
-        {
-            return 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * n) / (frameSize - 1))) +
-                   (0.14128 * Math.Cos((4 * Math.PI * n) / (frameSize - 1))) - (0.01168 * Math.Cos((4 * Math.PI * n) / (frameSize - 1)));
-        }
-
+       
 
         /// <summary>
-        /// Функция окна Хэннинга
+        /// Функция окна Хэмминга
         /// </summary>
         /// <param name="windowsize">длина фрейма для окна</param>
         /// <returns>массив со значениями оконной функции</returns>
-        public static double[] hanning(int windowsize)
+        public static double[] Hamming(int windowsize)
         {
             double[] w = new double[windowsize];
             for (int t = 0; t < windowsize; t++)
             {
-                w[t] = 0.54 - 0.46 * Math.Cos(2 * Math.PI * t / windowsize);
+                w[t] = 0.54f - 0.46f * Math.Cos(2 * Math.PI * t / (windowsize - 1));
             }
             return w;
         }
 
 
-        public static double[] hann(int windowsize)
+        public static double[] Hann(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 0.5f - 0.5f * Math.Cos((2 * Math.PI * n) / (windowsize - 1));
+            }
+            return w;
+        }
+
+        public static double[] BlackmannHarris(int windowsize)
         {
             double[] w = new double[windowsize];
             for (int t = 0; t < windowsize; t++)
             {
-                w[t] = 0.5 * (1 - Math.Cos((2 * Math.PI * t) / (windowsize - 1)));
+                w[t] = 0.35875f - (0.48829f * Math.Cos((2 * Math.PI * t) / (windowsize - 1))) +
+                   (0.14128f * Math.Cos((4 * Math.PI * t) / (windowsize - 1))) - (0.01168f * Math.Cos((4 * Math.PI * t) / (windowsize - 1)));
 
             }
             return w;
         }
 
-        public static double[] blackmannHarris(int windowsize)
+        public static double[] RectangleWindow(int windowsize)
         {
             double[] w = new double[windowsize];
-            for (int t = 0; t < windowsize; t++)
+            for (int n = 0; n < windowsize; n++)
             {
-                w[t] = 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * t) / (windowsize - 1))) +
-                   (0.14128 * Math.Cos((4 * Math.PI * t) / (windowsize - 1))) - (0.01168 * Math.Cos((4 * Math.PI * t) / (windowsize - 1)));
+                w[n] = 1;
+
+            }
+
+            return w;
+        }
+
+
+        public static double[] SinWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = Math.Sin((Math.PI * n) / (windowsize - 1));
+            }
+            return w;
+        }
+
+        public static double[] BartlettWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 1 - ((n / ((windowsize - 1) / 2)) - 1);
+            }
+            return w;
+        }
+
+     
+            public static double[] BartlettHannWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 0.62f - 0.48f * Math.Abs((n/ windowsize - 1) - 0.5f) - 0.38f * Math.Cos((2*Math.PI * n) /( windowsize - 1));
+            }
+            return w;
+        }
+
+
+        public static double[] Blackmann(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+          
 
             }
             return w;
+        }
 
 
-        
+        public static double[] temp(int windowsize)
+        {
+            double[] w = new double[windowsize];
+
+            return w;
         }
 
 
