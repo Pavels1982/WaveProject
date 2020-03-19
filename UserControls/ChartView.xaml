@@ -57,6 +57,22 @@
                 />
         </StackPanel>
 
+        <StackPanel
+            VerticalAlignment="Bottom"
+            Grid.Column="1"
+            Grid.Row="0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left">
+
+            <ComboBox 
+                Width="150"
+                SelectedItem="{Binding SelectedWindowFunc}"
+                ItemsSource="{Binding ListWindowFunc}" />
+
+
+        </StackPanel>
+        
+        
         <StackPanel 
              Background="Gray"
             Grid.Column="1"
@@ -68,7 +84,7 @@
             />
             <Slider
             Value="{Binding FFTWidth}"
-            Maximum="2048"
+            Maximum="{Binding MaxFFTWidth}"
             Width="200"
            Foreground="Gray"
                 />

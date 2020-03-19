@@ -3,6 +3,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -19,6 +20,10 @@ namespace VoiceСhanging.UserControls
 {
     public class ChartAnalyzingViewModel : INotifyPropertyChanged
     {
+        private string[] listWindow = new string[] {
+            "Прямоугольное Окно","Окно Хамминга","Окно Ханна","Окно Блэкмэн-Харриса","Синус-Окно","Окно Барлетта","Окно Барлетта-Ханна"
+        };
+
 
             public PlotModel Model { get; set; }
             public LineSeries Line { get; set; } = new LineSeries();
@@ -26,6 +31,28 @@ namespace VoiceСhanging.UserControls
             public PlotModel FFTModel { get; set; }
             public LineSeries FFTLine { get; set; } = new LineSeries();
             private string FileName { get; set; }
+
+            public int WindowSize { get; set; } = 1000;
+            public int MaxFFTWidth { get; set; }
+
+        public ObservableCollection<string> ListWindowFunc { get; set; } = new ObservableCollection<string>();
+
+        private string selectedWindowFunc;
+        public string SelectedWindowFunc
+        {
+            get
+            {
+                return selectedWindowFunc;
+            }
+            set
+            {
+                selectedWindowFunc = value;
+                if (RectangleUI != null)
+                    ProcessFFT();
+            }
+        }
+            
+
 
             private RectangleBarSeries Bar { get; set; } = new RectangleBarSeries();
             private RectangleBarItem RectangleUI { get; set; }
@@ -50,7 +77,7 @@ namespace VoiceСhanging.UserControls
    
 
             public int Width
-            {
+        {
                 get
                 {
                     return this.width;
@@ -69,14 +96,14 @@ namespace VoiceСhanging.UserControls
 
             private int fftwidth = 1025;
             public int FFTWidth
-            {
+        {
                 get
                 {
                     return this.fftwidth;
                 }
                 set
                 {
-                    if (value > 20 && value < 2048)
+                    if (value > 20 && value < this.MaxFFTWidth)
                     {
                         this.fftwidth = value;
                         FFTModel.Axes[0].MaximumRange = value;
@@ -125,6 +152,7 @@ namespace VoiceСhanging.UserControls
             {
                 InitialChartView();
                 InitialFFTChartView();
+                listWindow.ToList().ForEach(s => ListWindowFunc.Add(s));
             }
 
             private void InitialFFTChartView()
@@ -147,6 +175,8 @@ namespace VoiceСhanging.UserControls
                     AbsoluteMaximum = 2049,
                     AbsoluteMinimum = 0,
                     LabelFormatter = str,
+                    MaximumRange = 1000,
+                    Minimum = 1000
 
                 };
 
@@ -166,6 +196,31 @@ namespace VoiceСhanging.UserControls
                 FFTModel.Axes.Add(YAxis);
                 FFTModel.InvalidatePlot(true);
             }
+
+        private double[] WindowFunc(string windowName, int windowSize)
+        {
+            switch (windowName)
+            {
+                case "Прямоугольное Окно":
+                    return FFTHelper.RectangleWindow(windowSize);
+                case "Окно Хамминга":
+                    return FFTHelper.Hamming(windowSize);
+                case "Окно Ханна":
+                    return FFTHelper.Hann(windowSize);
+                case "Окно Блэкмэн-Харриса":
+                    return FFTHelper.BlackmannHarris(windowSize);
+                case "Синус-Окно":
+                    return FFTHelper.SinWindow(windowSize);
+                case "Окно Барлетта":
+                    return FFTHelper.BartlettWindow(windowSize);
+                case "Окно Барлетта-Ханна":
+                    return FFTHelper.BartlettHannWindow(windowSize);
+                default:
+                    return FFTHelper.RectangleWindow(windowSize);
+
+            }
+        
+        }
 
             private void InitialChartView()
             {
@@ -234,34 +289,39 @@ namespace VoiceСhanging.UserControls
 
                 if (isPanBar && RectangleUI != null)
                 {
-                //double width = RectangleUI.X1 - RectangleUI.X0;
-                double width = 2048;
                 int offset = X - LastX;
-                //RectangleUI.X0 = X - (width / 2f);
-                //RectangleUI.X1 = (width / 2f) + X;
                 RectangleUI.X0 += offset;
                 RectangleUI.X1 += offset;
-                SelectedData.Clear();
-                double[] han = FFTHelper.BlackmannHarris((int)width);
-                int px = -1;
-                int i = 0;
-                Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
-                    {
-                        if (px == -1) px = (int)p.X;
-                       
-                        double pY = IsMagnitude ? p.Y* han[i] : p.Y;
-                        SelectedData.Add(new Complex(pY, 0));
-                        if (i < width-1) i++;
-                    });
 
-                //  SelectDataChanged(SelectedData, px);
+                ProcessFFT();
 
-                LastX = X;
+                  LastX = X;
                 Model.InvalidatePlot(true);
                 }
 
 
             }
+        private void ProcessFFT()
+        {
+
+            double width = RectangleUI.X1 - RectangleUI.X0;
+            SelectedData.Clear();
+
+            double[] func = WindowFunc(SelectedWindowFunc, (int)width);
+            int px = -1;
+            int i = 0;
+            Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
+            {
+                if (px == -1) px = (int)p.X;
+
+                double pY = !IsMagnitude ? p.Y * func[i] : p.Y;
+                SelectedData.Add(new Complex(pY, 0));
+                if (i < width - 1) i++;
+            });
+
+            Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+        }
+
 
             private void SelectDataChanged(List<Complex> selectedData, int start)
             {
@@ -414,7 +474,7 @@ namespace VoiceСhanging.UserControls
         }
 
 
-        private void Process(int start, int end)
+        private void Process2(int start, int end)
         {
             FFTLine.Points.Clear();
             List<Val> temp = new List<Val>(2048);
@@ -431,8 +491,8 @@ namespace VoiceСhanging.UserControls
                     FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray()).ToList().ForEach(p =>
                     {
 
-                            temp[i].Magnitude += p.Magnitude;
-                            temp[i].Rep++;
+                        temp[i].Magnitude += p.Magnitude;
+                        temp[i].Rep++;
                         i++;
                     });
             }
@@ -440,7 +500,7 @@ namespace VoiceСhanging.UserControls
             for (int i = 0; i < 2048; i++)
             {
                 temp[i].Magnitude = (temp[i].Magnitude / 2048);
-               // temp[i].Magnitude = temp[i].Rep > cons ? (temp[i].Magnitude / temp[i].Rep) : 0;
+                // temp[i].Magnitude = temp[i].Rep > cons ? (temp[i].Magnitude / temp[i].Rep) : 0;
                 FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
             }
 
@@ -448,10 +508,50 @@ namespace VoiceСhanging.UserControls
 
         }
 
-        private void Morphing()
+        private void Process(int start, int end)
+        {
+
+                FFTLine.Points.Clear();
+
+                int err = (SelectedData.Count() % 2);
+
+                SelectedData.RemoveRange((SelectedData.Count() - 1 - err), err);
+          
+            Val[] temp = new Val[SelectedData.Count];
+
+
+                int i1 = 0;
+
+                FFT2Helper.fft(SelectedData.ToArray()).ToList().ForEach(p =>
+                {
+                    temp[i1] = new Val();
+                    temp[i1].Magnitude += p.Magnitude;
+                    temp[i1].Rep++;
+                    i1++;
+                });
+
+
+                for (int i = 0; i < SelectedData.Count / 2; i++)
+                {
+                    temp[i].Magnitude = (temp[i].Magnitude / SelectedData.Count);
+                    FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
+                }
+                FFTModel.Axes[0].AbsoluteMaximum = temp.Count() / 2;
+                //FFTModel.Axes[0].MaximumRange = temp.Count() / 2;
+                //FFTModel.Axes[0].MinimumRange = temp.Count() / 2;
+                FFTModel.Axes[1].Maximum = FFTLine.Points.Select(p => p.Y).Max();
+                FFTModel.Axes[0].MajorStep = (FFTModel.Axes[0].MaximumRange / 100) * 10;
+                MaxFFTWidth = temp.Count() / 2;
+               // FFTWidth = MaxFFTWidth - 1;
+                FFTModel.InvalidatePlot(true);
+
+        }
+
+        private void Morphing2()
         {
             int startPos = (int)RectangleUI.X0;
             DataPoint[] res = new DataPoint[SelectedData.Count() - 2048];
+
             for (int x = 0; x < SelectedData.Count() - 2048; x += 100)
             {
 
@@ -480,11 +580,51 @@ namespace VoiceСhanging.UserControls
                     IFFT(tempFFT, startPos + x);
                 }
             }
-          //  Line.Points.AddRange(res.ToList());
+            //  Line.Points.AddRange(res.ToList());
             Model.InvalidatePlot(true);
 
 
         }
+
+
+
+
+        private void Morphing()
+        {
+            int startPos = (int)RectangleUI.X0;
+
+            int err = (SelectedData.Count() % 2);
+
+            SelectedData.RemoveRange((SelectedData.Count() - 1 - err), err);
+     
+
+            Complex[] tempFFT = FFT2Helper.fft(SelectedData.ToArray());
+
+                    int start = 0;
+                    int count = 90;
+                    int dest = 10;
+
+                    tempFFT.ToList().GetRange(start, count).CopyTo(tempFFT.ToArray(), dest);
+
+                    for (int i = start; i < dest - start; i++)
+                    {
+                        tempFFT[i] = new Complex(0, 0);
+                    }
+
+                    for (int i = start; i < start + count; i++)
+                    {
+                        tempFFT[(tempFFT.Count() - 1) - i] = tempFFT[i];
+                    }
+
+                    IFFT(tempFFT, startPos);
+
+            //  Line.Points.AddRange(res.ToList());
+            Model.InvalidatePlot(true);
+
+
+        }
+
+
 
 
 
