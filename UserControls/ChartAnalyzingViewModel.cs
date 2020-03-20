@@ -20,9 +20,7 @@ namespace VoiceСhanging.UserControls
 {
     public class ChartAnalyzingViewModel : INotifyPropertyChanged
     {
-        private string[] listWindow = new string[] {
-            "Прямоугольное Окно","Окно Хамминга","Окно Ханна","Окно Блэкмэн-Харриса","Синус-Окно","Окно Барлетта","Окно Барлетта-Ханна"
-        };
+       
 
 
             public PlotModel Model { get; set; }
@@ -33,7 +31,7 @@ namespace VoiceСhanging.UserControls
             private string FileName { get; set; }
 
             public int WindowSize { get; set; } = 1000;
-            public int MaxFFTWidth { get; set; }
+        public int MaxFFTWidth { get; set; } 
 
         public ObservableCollection<string> ListWindowFunc { get; set; } = new ObservableCollection<string>();
 
@@ -51,10 +49,10 @@ namespace VoiceСhanging.UserControls
                     ProcessFFT();
             }
         }
-            
 
 
-            private RectangleBarSeries Bar { get; set; } = new RectangleBarSeries();
+
+        private RectangleBarSeries Bar { get; set; } = new RectangleBarSeries();
             private RectangleBarItem RectangleUI { get; set; }
             private bool isSelected = false;
             public int X { get; set; }
@@ -152,7 +150,7 @@ namespace VoiceСhanging.UserControls
             {
                 InitialChartView();
                 InitialFFTChartView();
-                listWindow.ToList().ForEach(s => ListWindowFunc.Add(s));
+                FFTHelper.listWindow.ToList().ForEach(s => ListWindowFunc.Add(s));
             }
 
             private void InitialFFTChartView()
@@ -197,30 +195,7 @@ namespace VoiceСhanging.UserControls
                 FFTModel.InvalidatePlot(true);
             }
 
-        private double[] WindowFunc(string windowName, int windowSize)
-        {
-            switch (windowName)
-            {
-                case "Прямоугольное Окно":
-                    return FFTHelper.RectangleWindow(windowSize);
-                case "Окно Хамминга":
-                    return FFTHelper.Hamming(windowSize);
-                case "Окно Ханна":
-                    return FFTHelper.Hann(windowSize);
-                case "Окно Блэкмэн-Харриса":
-                    return FFTHelper.BlackmannHarris(windowSize);
-                case "Синус-Окно":
-                    return FFTHelper.SinWindow(windowSize);
-                case "Окно Барлетта":
-                    return FFTHelper.BartlettWindow(windowSize);
-                case "Окно Барлетта-Ханна":
-                    return FFTHelper.BartlettHannWindow(windowSize);
-                default:
-                    return FFTHelper.RectangleWindow(windowSize);
-
-            }
-        
-        }
+       
 
             private void InitialChartView()
             {
@@ -307,7 +282,7 @@ namespace VoiceСhanging.UserControls
             double width = RectangleUI.X1 - RectangleUI.X0;
             SelectedData.Clear();
 
-            double[] func = WindowFunc(SelectedWindowFunc, (int)width);
+            double[] func = FFTHelper.WindowFunc(SelectedWindowFunc, (int)width);
             int px = -1;
             int i = 0;
             Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>

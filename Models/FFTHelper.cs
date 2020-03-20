@@ -9,6 +9,11 @@ namespace VoiceСhanging.Models
 {
     public class FFTHelper
     {
+        public static string[] listWindow = new string[] {
+            "Прямоугольное Окно","Окно Хамминга","Окно Ханна","Окно Блэкмэн-Харриса","Синус-Окно","Окно Барлетта","Окно Барлетта-Ханна","Окно Блэкмэна", "Окно Наталла"
+        };
+
+
         private static Complex w(int k, int N)
         {
             if (k % N == 0) return 1;
@@ -270,11 +275,46 @@ namespace VoiceСhanging.Models
             double[] w = new double[windowsize];
             for (int n = 0; n < windowsize; n++)
             {
-          
+                w[n] = 0.42f - 0.5f * Math.Cos((2 * Math.PI * n) / windowsize - 1) + 0.08f * Math.Cos((4 * Math.PI * n) / (windowsize - 1));
 
             }
             return w;
         }
+
+        public static double[] NuttallWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 0.355768f - 0.487396f * Math.Cos((2 * Math.PI * n) / (windowsize - 1)) + 0.144232f * Math.Cos((4 * Math.PI * n) / (windowsize - 1)) - 0.012604f * Math.Cos((6 * Math.PI * n) / (windowsize - 1));
+            }
+            return w;
+        }
+
+        public static double[] BlackmanNuttallWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 0.3635819f - 0.4891775f * Math.Cos((2 * Math.PI * n) / (windowsize - 1)) + 0.1365995f * Math.Cos((4 * Math.PI * n) / (windowsize - 1)) - 0.0106411f * Math.Cos((6 * Math.PI * n) / (windowsize - 1));
+            }
+            return w;
+        }
+
+
+
+        public static double[] FlatTopWindow(int windowsize)
+        {
+            double[] w = new double[windowsize];
+            for (int n = 0; n < windowsize; n++)
+            {
+                w[n] = 1.0f - 1.93f * Math.Cos((2 * Math.PI * n)/(windowsize - 1)) + 1.29f * Math.Cos((4 * Math.PI * n)/(windowsize - 1)) - 0.
+            }
+            return w;
+        }
+
+
+
 
 
         public static double[] temp(int windowsize)
@@ -284,6 +324,37 @@ namespace VoiceСhanging.Models
             return w;
         }
 
+
+
+        public static double[] WindowFunc(string windowName, int windowSize)
+        {
+            switch (windowName)
+            {
+                case "Прямоугольное Окно":
+                    return FFTHelper.RectangleWindow(windowSize);
+                case "Окно Хамминга":
+                    return FFTHelper.Hamming(windowSize);
+                case "Окно Ханна":
+                    return FFTHelper.Hann(windowSize);
+                case "Окно Блэкмэн-Харриса":
+                    return FFTHelper.BlackmannHarris(windowSize);
+                case "Синус-Окно":
+                    return FFTHelper.SinWindow(windowSize);
+                case "Окно Барлетта":
+                    return FFTHelper.BartlettWindow(windowSize);
+                case "Окно Барлетта-Ханна":
+                    return FFTHelper.BartlettHannWindow(windowSize);
+                case "Окно Блэкмэна":
+                    return FFTHelper.Blackmann(windowSize);
+                case "Окно Наталла":
+                    return FFTHelper.NuttallWindow(windowSize);
+
+                default:
+                    return FFTHelper.RectangleWindow(windowSize);
+
+            }
+
+        }
 
 
 

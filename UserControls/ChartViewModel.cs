@@ -3,6 +3,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -33,23 +34,25 @@ namespace VoiceСhanging.Models
         public int LastX { get; set; }
 
         public bool IsMagnitude { get; set; } = false;
+        public int MaxFFTWidth { get; set; } = 1024;
 
-        private int bindX;
-        public int BindX
+        public ObservableCollection<string> ListWindowFunc { get; set; } = new ObservableCollection<string>();
+
+        private string selectedWindowFunc;
+        public string SelectedWindowFunc
         {
             get
             {
-                return bindX;
+                return selectedWindowFunc;
             }
-
             set
             {
-                bindX = value;
-                isPanBar = true;
-               // isSelected = true;
-                Model_MouseMove(null, null);
+                selectedWindowFunc = value;
+                if (RectangleUI != null)
+                    ProcessFFT();
             }
         }
+
 
         private int startX { get; set; }
         private int width = 5000;
@@ -131,6 +134,7 @@ namespace VoiceСhanging.Models
         {
             InitialChartView();
             InitialFFTChartView();
+            FFTHelper.listWindow.ToList().ForEach(s => ListWindowFunc.Add(s));
         }
 
         private void InitialFFTChartView()
@@ -217,17 +221,17 @@ namespace VoiceСhanging.Models
 
         private void Model_MouseMove(object sender, OxyMouseEventArgs e)
         {
-           
+            X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
 
             if (isSelected )
             {
-                 X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
+                 
 
                 if (RectangleUI == null)
                 {
                     startX = X;
                     RectangleUI = new RectangleBarItem(startX, Int16.MinValue, X, Int16.MaxValue);
-                     RectangleUI.Color = OxyColor.FromArgb(100, 250, 0, 0); 
+                    RectangleUI.Color = OxyColor.FromArgb(100, 250, 0, 0); 
                     Bar.Items.Add(RectangleUI);
                 }
                 else
@@ -252,36 +256,14 @@ namespace VoiceСhanging.Models
 
             if (isPanBar && RectangleUI != null)
             {
-               
-                if (e == null) { X = (int)RectangleUI.X0 + BindX; }
-                else
-                    X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
+
 
                 WindowPositionChanged?.Invoke(X - LastX);
-
-                //  X = (int)(OxyPlot.Axes.Axis.InverseTransform(e.Position, Model.Axes[0], Model.Axes[1]).X);
-
-                
                 int offset = X - LastX;
-              //  RectangleUI.X0 = X - (width / 2f);
-               // RectangleUI.X1 = (width / 2f) + X;
                 RectangleUI.X0 += offset;
                 RectangleUI.X1 += offset;
-                double width = RectangleUI.X1 - RectangleUI.X0;
-                SelectedData.Clear();
-                int px = -1;
-                double[] han = FFTHelper.BartlettWindow(1000);
-                //double[] han = FFTHelper.hanning(2048);
-                int i = 0;
-                Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X < RectangleUI.X1).ToList().ForEach(p =>
-                {
-                    if (px == -1) px = (int)p.X;
-                    double pY = IsMagnitude? p.Y * han[i]: p.Y;
-                    SelectedData.Add(new Complex(pY, 0));
-                    if (i < 999) i++;
-                });
+                ProcessFFT();
 
-                SelectDataChanged(SelectedData, px);
                 LastX = X;
                 Model.InvalidatePlot(true);
             }
@@ -289,59 +271,47 @@ namespace VoiceСhanging.Models
 
         }
 
+        private void ProcessFFT()
+        {
+
+            double width = RectangleUI.X1 - RectangleUI.X0;
+            SelectedData.Clear();
+
+            double[] func = FFTHelper.WindowFunc(SelectedWindowFunc, (int)width);
+            int px = -1;
+            int i = 0;
+            Line.Points.Where(point => point.X >= RectangleUI.X0 && point.X <= RectangleUI.X1).ToList().ForEach(p =>
+            {
+                if (px == -1) px = (int)p.X;
+
+                double pY =  p.Y * func[i];
+                SelectedData.Add(new Complex(pY, 0));
+                if (i < width - 1) i++;
+            });
+
+            SelectDataChanged(SelectedData, px);
+        }
+
+
+
+
         private void SelectDataChanged(List<Complex> selectedData, int start)
         {
             FFTLine.Points.Clear();
-            // FFTcom = FFTHelper.FFT(selectedData.ToArray()).ToList();
             FFTcom = FFT2Helper.fft(selectedData.ToArray()).ToList();
 
-            //int freq = 100;
-            //int freqWidth = 50;
-            //int shift = 50;
-
-            //Complex[] temp = FFTcom.ToArray();
-            //FFTcom.GetRange(freq, freqWidth).CopyTo(temp, freq + shift);
-
-            //FFTcom.GetRange((FFTcom.Count() - 1) - freq - freqWidth, freqWidth).CopyTo(temp, (FFTcom.Count() - 1) - freq - freqWidth - shift);
-
-
-            //FFTcom = temp.ToList();
-
-            //for (int i = freq; i < freq + shift; i++)
-            //{
-            //    FFTcom[i] = new Complex(0, 0);
-            //    FFTcom[FFTcom.Count()-1 - i] = new Complex(0, 0);
-
-
-            //}
-
-
-
-            //  FFTcom.RemoveRange(FFTcom.Count / 2, FFTcom.Count / 2);
-            double[] han = FFTHelper.Hamming(FFTcom.Count());
             int x = 0;
             FFTcom.ForEach(comp =>
             {
                 //FFTLine.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
                 //FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
                 FFTLine.Points.Add(new DataPoint(x, comp.Magnitude));
-               // FFTLine.Points.Add(new DataPoint(x, IsMagnitude ? GetYPosLog(comp.Magnitude) : comp.Magnitude));
                 x++;
-                //Окно Хамминга в ДБ
-                // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));
-                //FFTLine.Points.Add(new DataPoint(x++, FFTHelper.Hamming(comp.Magnitude, 1000)));
-
-                //Магнитуда в  ДБ
-                // double magnitude_dB = 10 * Math.Log10((comp.Real * comp.Real + comp.Imaginary * comp.Imaginary));
-                //  FFTLine.Points.Add(new DataPoint(x++, magnitude_dB - 90));
 
 
             }
 
             );
-
-            //FFTModel.Axes[0].MaximumRange = FFTcom.Count;
-            //FFTModel.Axes[0].MinimumRange = FFTcom.Count;
             FFTModel.InvalidatePlot(true);
           //  IFFT(start);
         }
