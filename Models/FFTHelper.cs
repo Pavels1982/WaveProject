@@ -10,7 +10,7 @@ namespace VoiceСhanging.Models
     public class FFTHelper
     {
         public static string[] listWindow = new string[] {
-            "Прямоугольное Окно","Окно Хамминга","Окно Ханна","Окно Блэкмэн-Харриса","Синус-Окно","Окно Барлетта","Окно Барлетта-Ханна","Окно Блэкмэна", "Окно Наталла"
+            "Прямоугольное Окно","Окно Хамминга","Окно Ханна","Окно Блэкмэн-Харриса","Синус-Окно","Окно Барлетта","Окно Барлетта-Ханна","Окно Блэкмэна", "Окно Наталла", "Окно Блэкмэн-Наталла", "Окно с плоской вершиной"
         };
 
 
@@ -308,7 +308,7 @@ namespace VoiceСhanging.Models
             double[] w = new double[windowsize];
             for (int n = 0; n < windowsize; n++)
             {
-                w[n] = 1.0f - 1.93f * Math.Cos((2 * Math.PI * n)/(windowsize - 1)) + 1.29f * Math.Cos((4 * Math.PI * n)/(windowsize - 1)) - 0.
+                w[n] = 1.0f - 1.93f * Math.Cos((2 * Math.PI * n) / (windowsize - 1)) + 1.29f * Math.Cos((4 * Math.PI * n) / (windowsize - 1)) - 0.388f * Math.Cos((6 * Math.PI * n) / (windowsize - 1)) + 0.032 * Math.Cos((8 * Math.PI * n) / (windowsize - 1));
             }
             return w;
         }
@@ -331,23 +331,27 @@ namespace VoiceСhanging.Models
             switch (windowName)
             {
                 case "Прямоугольное Окно":
-                    return FFTHelper.RectangleWindow(windowSize);
+                    return RectangleWindow(windowSize);
                 case "Окно Хамминга":
-                    return FFTHelper.Hamming(windowSize);
+                    return Hamming(windowSize);
                 case "Окно Ханна":
-                    return FFTHelper.Hann(windowSize);
+                    return Hann(windowSize);
                 case "Окно Блэкмэн-Харриса":
-                    return FFTHelper.BlackmannHarris(windowSize);
+                    return BlackmannHarris(windowSize);
                 case "Синус-Окно":
-                    return FFTHelper.SinWindow(windowSize);
+                    return SinWindow(windowSize);
                 case "Окно Барлетта":
-                    return FFTHelper.BartlettWindow(windowSize);
+                    return BartlettWindow(windowSize);
                 case "Окно Барлетта-Ханна":
-                    return FFTHelper.BartlettHannWindow(windowSize);
+                    return BartlettHannWindow(windowSize);
                 case "Окно Блэкмэна":
-                    return FFTHelper.Blackmann(windowSize);
+                    return Blackmann(windowSize);
                 case "Окно Наталла":
-                    return FFTHelper.NuttallWindow(windowSize);
+                    return NuttallWindow(windowSize);
+                case "Окно Блэкмэн-Наталла":
+                    return BlackmanNuttallWindow(windowSize);
+                case "Окно с плоской вершиной":
+                    return FlatTopWindow(windowSize);
 
                 default:
                     return FFTHelper.RectangleWindow(windowSize);
