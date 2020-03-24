@@ -55,6 +55,7 @@
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Printing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -77,6 +78,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="UserControls\ChartAnalizerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserControls\ChartView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -91,6 +96,9 @@
     </Compile>
     <Compile Include="Models\FFT2Helper.cs" />
     <Compile Include="UserControls\ChartAnalyzingViewModel.cs" />
+    <Compile Include="UserControls\ChartAnalizerView.xaml.cs">
+      <DependentUpon>ChartAnalizerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\ChartView.xaml.cs">
       <DependentUpon>ChartView.xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="VoiceСhanging.UserControls.ChartView"
+﻿<UserControl x:Class="VoiceСhanging.UserControls.ChartAnalizerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -74,17 +74,15 @@
         
         
         <StackPanel 
-     
+             Background="Gray"
             Grid.Column="1"
             Grid.Row="1"
             Orientation="Vertical">
-       
-                <oxy:PlotView 
-            Model="{Binding FFTModel}"
-            Height="285"
-            />
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                <Image Source="{Binding Spectrogramm}" Width="600" Height="600"/>
+            </ScrollViewer>
 
-  
+
             <Slider
             Value="{Binding FFTWidth}"
             Maximum="{Binding MaxFFTWidth}"

@@ -284,7 +284,7 @@ namespace VoiceСhanging.Models
             {
                 if (px == -1) px = (int)p.X;
 
-                double pY =  p.Y * func[i];
+                double pY = p.Y * func[i] ;
                 SelectedData.Add(new Complex(pY, 0));
                 if (i < width - 1) i++;
             });
@@ -305,7 +305,7 @@ namespace VoiceСhanging.Models
             {
                 //FFTLine.Points.Add(new DataPoint(x++, 10 * Math.Log10(GetYPos(comp) / FFTcom.Count())));
                 //FFTLine.Points.Add(new DataPoint(x++, Math.Abs(GetYPosLog(comp))));
-                FFTLine.Points.Add(new DataPoint(x, comp.Magnitude));
+                FFTLine.Points.Add(new DataPoint(x, !IsMagnitude ? comp.Magnitude:GetYPosLog(comp)));
                 x++;
 
 

@@ -281,6 +281,24 @@ namespace VoiceСhanging.Models
             return w;
         }
 
+
+        //public static double[] Kaiser(int windowsize)
+        //{
+        //    double a = 20;
+        //    double b = 0.5842f * Math.Pow(a - 21, 0.4f) + 0.07886f * (a - 21);
+            
+        //    double[] w = new double[windowsize];
+        //    for (int n = 0; n < windowsize; n++)
+        //    {
+         
+
+        //    }
+        //    return w;
+        //}
+
+
+
+
         public static double[] NuttallWindow(int windowsize)
         {
             double[] w = new double[windowsize];

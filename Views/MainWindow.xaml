@@ -13,7 +13,7 @@
             <StackPanel Orientation="Vertical">
                 <controls:ChartView DataContext="{Binding Model1}"/>
                 <controls:ChartView DataContext="{Binding Model2}"/>
-                <controls:ChartView DataContext="{Binding Model3}"/>
+                <controls:ChartAnalizerView DataContext="{Binding Model3}"/>
 
             </StackPanel>
         </ScrollViewer>

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -13,6 +15,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using VoiceСhanging.Models;
 using static VoiceСhanging.Models.WaveData;
 
@@ -20,8 +24,8 @@ namespace VoiceСhanging.UserControls
 {
     public class ChartAnalyzingViewModel : INotifyPropertyChanged
     {
-       
 
+        public BitmapImage Spectrogramm { get; set; }
 
             public PlotModel Model { get; set; }
             public LineSeries Line { get; set; } = new LineSeries();
@@ -267,10 +271,10 @@ namespace VoiceСhanging.UserControls
                 int offset = X - LastX;
                 RectangleUI.X0 += offset;
                 RectangleUI.X1 += offset;
+                //Process2((int)RectangleUI.X0, (int)RectangleUI.X1);
+                 ProcessFFT();
 
-                ProcessFFT();
-
-                  LastX = X;
+                LastX = X;
                 Model.InvalidatePlot(true);
                 }
 
@@ -294,7 +298,7 @@ namespace VoiceСhanging.UserControls
                 if (i < width - 1) i++;
             });
 
-            Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+          //  Process((int)RectangleUI.X0, (int)RectangleUI.X1);
         }
 
 
@@ -302,8 +306,7 @@ namespace VoiceСhanging.UserControls
             {
                 FFTLine.Points.Clear();
                 FFTcom = FFT2Helper.fft(selectedData.ToArray()).ToList();
-                double[] han = FFTHelper.Hamming(FFTcom.Count());
-                int x = 0;
+                 int x = 0;
                 FFTcom.ForEach(comp =>
                 {
                  
@@ -343,7 +346,7 @@ namespace VoiceСhanging.UserControls
                 if (intensityDB < minDB) intensityDB = minDB;
                 double percent = intensityDB / minDB;
                 // we want 0dB to be at the top (i.e. yPos = 0)
-                double yPos = percent;
+                double yPos = intensityDB;
                 return yPos;
             }
 
@@ -378,7 +381,8 @@ namespace VoiceСhanging.UserControls
 
                     if (!IsMagnitude)
                     {
-                        Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+                        Process2((int)RectangleUI.X0, (int)RectangleUI.X1);
+                       // Process((int)RectangleUI.X0, (int)RectangleUI.X1);
                     }
                     else
                         Morphing();
@@ -409,8 +413,8 @@ namespace VoiceСhanging.UserControls
 
                     if (!isPanBar)
                     {
-                        isSelected = true;
-                        SelectedData.Clear();
+                    isSelected = true;
+                    SelectedData.Clear();
                         if (RectangleUI != null) ClearBar();
 
                     }
@@ -451,37 +455,84 @@ namespace VoiceСhanging.UserControls
 
         private void Process2(int start, int end)
         {
+            //Сдвиг окна
+            int shift = 32;
+
+            Bitmap btm = new Bitmap((end - start) / shift, 512);
+            System.Drawing.Color[] freq = new System.Drawing.Color[1024];
+            int btm_i = 0;
+
+
             FFTLine.Points.Clear();
             List<Val> temp = new List<Val>(2048);
-
             double[] result = new double[2048];
             result.ToList().ForEach(r => temp.Add(new Val()));
 
 
-            for (int x = 0; x < SelectedData.Count() - 2048; x += 250)
+            for (int x = 0; x < SelectedData.Count() - 2048; x += shift)
             {
                 int i = 0;
                 if (x + 2048 < SelectedData.Count() - 2048)
-
+                {
                     FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray()).ToList().ForEach(p =>
                     {
 
                         temp[i].Magnitude += p.Magnitude;
                         temp[i].Rep++;
+                        int Db = (int)(GetYPosLog(p)) * 10;
+                        int intense = Db <= 0 ? 255 : Math.Abs(Db - 255);
+
+                        // int intense = p.Magnitude > 255 ? 255: (int)(p.Magnitude);
+                        if (i < 512) freq[i] = System.Drawing.Color.FromArgb(255, intense, intense, intense);
                         i++;
                     });
+
+
+                    for (int yi = 511; yi > 0; yi--)
+                    {
+                        btm.SetPixel(btm_i, yi, freq[Math.Abs(yi - 511)]);
+                    }
+                }
+                btm_i++;
             }
 
-            for (int i = 0; i < 2048; i++)
-            {
-                temp[i].Magnitude = (temp[i].Magnitude / 2048);
-                // temp[i].Magnitude = temp[i].Rep > cons ? (temp[i].Magnitude / temp[i].Rep) : 0;
-                FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
-            }
+            Spectrogramm = BitmapToImage(btm);
 
-            FFTModel.InvalidatePlot(true);
+
+            //for (int i = 0; i < 2048; i++)
+            //{
+            //    temp[i].Magnitude = (temp[i].Magnitude / 2048);
+            //    // temp[i].Magnitude = temp[i].Rep > cons ? (temp[i].Magnitude / temp[i].Rep) : 0;
+            //    FFTLine.Points.Add(new DataPoint(i, temp[i].Magnitude));
+            //}
+
+            //FFTModel.InvalidatePlot(true);
 
         }
+
+
+        public BitmapImage BitmapToImage(object o)
+        {
+
+            BitmapImage btm = new BitmapImage();
+            using (MemoryStream memStream2 = new MemoryStream())
+            {
+                (o as Bitmap).Save(memStream2, System.Drawing.Imaging.ImageFormat.Png);
+                memStream2.Position = 0;
+                btm.BeginInit();
+                btm.CacheOption = BitmapCacheOption.OnLoad;
+                btm.UriSource = null;
+                btm.StreamSource = memStream2;
+                btm.EndInit();
+            }
+
+            return btm;
+        }
+
+
+
+
+
 
         private void Process(int start, int end)
         {
