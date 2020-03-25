@@ -33,7 +33,8 @@ namespace VoiceСhanging.Models
             public static Complex[] fft(Complex[] x)
             {
                 Complex[] X;
-                int N = x.Length;
+    
+                int N = x.Length ;
                 if (N == 2)
                 {
                     X = new Complex[2];
@@ -49,8 +50,10 @@ namespace VoiceСhanging.Models
                         x_even[i] = x[2 * i];
                         x_odd[i] = x[2 * i + 1];
                     }
+
                     Complex[] X_even = fft(x_even);
                     Complex[] X_odd = fft(x_odd);
+
                     X = new Complex[N];
                     for (int i = 0; i < N / 2; i++)
                     {

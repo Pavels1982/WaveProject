@@ -67,6 +67,7 @@ namespace VoiceСhanging.Models
 
         private int WindowWidth = 2048;
 
+
         public int Width
         {
             get

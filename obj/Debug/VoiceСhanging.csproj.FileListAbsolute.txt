@@ -54,3 +54,5 @@ C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\Gene
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartView.baml
 D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartAnalizerView.g.cs
 D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartAnalizerView.baml
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartAnalizerView.g.cs
+C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartAnalizerView.baml

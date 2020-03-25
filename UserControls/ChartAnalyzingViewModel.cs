@@ -367,22 +367,28 @@ namespace VoiceСhanging.UserControls
                     }
                     else
                     {
-                        double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
+                    double[] func = FFTHelper.WindowFunc(SelectedWindowFunc, 512);
+                    double min = RectangleUI.X0 < RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                         double max = RectangleUI.X0 > RectangleUI.X1 ? RectangleUI.X0 : RectangleUI.X1;
                         RectangleUI = new RectangleBarItem(min, Int16.MinValue, max, Int16.MaxValue);
                         RectangleUI.Color = OxyColor.FromArgb(100, 0, 0, 250);
                         Bar.Items.Add(RectangleUI);
                         Bar.Items.RemoveAt(0);
+                        int func_i = 0;
                         Line.Points.Where(point => point.X > min && point.X < max).ToList().ForEach(p =>
                         {
-                            SelectedData.Add(new Complex(p.Y, 0));
+                            SelectedData.Add(new Complex(p.Y * func[func_i], 0));
+                            
+                            if (func_i == 511) func_i = 0; else
+                                func_i++;
+
                         });
                         LastX = (int)min;
 
                     if (!IsMagnitude)
                     {
                         Process2((int)RectangleUI.X0, (int)RectangleUI.X1);
-                       // Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+                        Process((int)RectangleUI.X0, (int)RectangleUI.X1);
                     }
                     else
                         Morphing();
@@ -456,41 +462,45 @@ namespace VoiceСhanging.UserControls
         private void Process2(int start, int end)
         {
             //Сдвиг окна
-            int shift = 32;
+            int shift = 256;
+            int width = 512;
 
-            Bitmap btm = new Bitmap((end - start) / shift, 512);
-            System.Drawing.Color[] freq = new System.Drawing.Color[1024];
+            Bitmap btm = new Bitmap((end - start) / shift, 256);
+            System.Drawing.Color[] freq = new System.Drawing.Color[128];
             int btm_i = 0;
 
 
             FFTLine.Points.Clear();
-            List<Val> temp = new List<Val>(2048);
-            double[] result = new double[2048];
+            List<Val> temp = new List<Val>(width);
+            double[] result = new double[width];
             result.ToList().ForEach(r => temp.Add(new Val()));
 
 
-            for (int x = 0; x < SelectedData.Count() - 2048; x += shift)
+            for (int x = 0; x < SelectedData.Count() - width; x += shift)
             {
                 int i = 0;
-                if (x + 2048 < SelectedData.Count() - 2048)
+                if (x + width < SelectedData.Count() - width)
                 {
-                    FFT2Helper.fft(SelectedData.GetRange(x, 2048).ToArray()).ToList().ForEach(p =>
+                    FFT2Helper.fft(SelectedData.GetRange(x, width).ToArray()).ToList().ForEach(p =>
                     {
 
                         temp[i].Magnitude += p.Magnitude;
                         temp[i].Rep++;
-                        int Db = (int)(GetYPosLog(p)) * 10;
-                        int intense = Db <= 0 ? 255 : Math.Abs(Db - 255);
 
-                        // int intense = p.Magnitude > 255 ? 255: (int)(p.Magnitude);
-                        if (i < 512) freq[i] = System.Drawing.Color.FromArgb(255, intense, intense, intense);
+                        int Db = (int)(GetYPosLog(p) + 8) * 8;
+                        int intense1 = Db <= 0 ? 0 : Db;
+                        intense1 = intense1 > 255 ? 255 : intense1;
+
+                        intense1 = Math.Abs(intense1 - 255) ;
+
+                        if (i < 128) freq[i] = System.Drawing.Color.FromArgb(255, intense1, intense1, intense1);
                         i++;
                     });
 
 
-                    for (int yi = 511; yi > 0; yi--)
+                    for (int yi = 127; yi > 0; yi--)
                     {
-                        btm.SetPixel(btm_i, yi, freq[Math.Abs(yi - 511)]);
+                        btm.SetPixel(btm_i, yi, freq[Math.Abs(yi - 127)]);
                     }
                 }
                 btm_i++;

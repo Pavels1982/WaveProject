@@ -55,6 +55,7 @@
                 Width="200"
                 Foreground="Gray"
                 />
+            <Image Source="{Binding Spectrogramm}"  HorizontalAlignment="Stretch" Height="800" VerticalAlignment="Top"/>
         </StackPanel>
 
         <StackPanel
@@ -78,9 +79,10 @@
             Grid.Column="1"
             Grid.Row="1"
             Orientation="Vertical">
-            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <Image Source="{Binding Spectrogramm}" Width="600" Height="600"/>
-            </ScrollViewer>
+            <oxy:PlotView 
+            Model="{Binding FFTModel}"
+            Height="285"
+            />
 
 
             <Slider
