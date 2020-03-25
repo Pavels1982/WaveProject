@@ -388,7 +388,7 @@ namespace VoiceСhanging.UserControls
                     if (!IsMagnitude)
                     {
                         Process2((int)RectangleUI.X0, (int)RectangleUI.X1);
-                        Process((int)RectangleUI.X0, (int)RectangleUI.X1);
+                       // Process((int)RectangleUI.X0, (int)RectangleUI.X1);
                     }
                     else
                         Morphing();
@@ -461,46 +461,44 @@ namespace VoiceСhanging.UserControls
 
         private void Process2(int start, int end)
         {
-            //Сдвиг окна
+            //Сдвиг окна (shift 500 - width 512)
             int shift = 256;
-            int width = 512;
+            int width = 1024;
+
+            //Диапазон частот (256 - до 22100Hz, 128 - до 11050Hz)
+            int freq_range = 256;
+            double[] func = FFTHelper.WindowFunc(SelectedWindowFunc, width);
 
             Bitmap btm = new Bitmap((end - start) / shift, 256);
-            System.Drawing.Color[] freq = new System.Drawing.Color[128];
+            System.Drawing.Color[] freq = new System.Drawing.Color[freq_range];
             int btm_i = 0;
 
-
             FFTLine.Points.Clear();
-            List<Val> temp = new List<Val>(width);
+
             double[] result = new double[width];
-            result.ToList().ForEach(r => temp.Add(new Val()));
-
-
             for (int x = 0; x < SelectedData.Count() - width; x += shift)
             {
                 int i = 0;
-                if (x + width < SelectedData.Count() - width)
+                int ii = 0;
+                if (x + width < SelectedData.Count() - 1)
                 {
                     FFT2Helper.fft(SelectedData.GetRange(x, width).ToArray()).ToList().ForEach(p =>
                     {
-
-                        temp[i].Magnitude += p.Magnitude;
-                        temp[i].Rep++;
-
-                        int Db = (int)(GetYPosLog(p) + 8) * 8;
+                        p = p.Magnitude * func[ii];
+                        int Db = (int)(GetYPosLog(p) + 5) * 8;
                         int intense1 = Db <= 0 ? 0 : Db;
+
                         intense1 = intense1 > 255 ? 255 : intense1;
-
-                        intense1 = Math.Abs(intense1 - 255) ;
-
-                        if (i < 128) freq[i] = System.Drawing.Color.FromArgb(255, intense1, intense1, intense1);
+                       // intense1 = Math.Abs(intense1 - 255) ;
+                        if (i < freq.Count()) freq[i] = System.Drawing.Color.FromArgb(255, intense1 , intense1 , 50);
                         i++;
+                        ii++;
                     });
 
 
-                    for (int yi = 127; yi > 0; yi--)
+                    for (int yi = freq.Count() - 1; yi > 0; yi--)
                     {
-                        btm.SetPixel(btm_i, yi, freq[Math.Abs(yi - 127)]);
+                        btm.SetPixel(btm_i, yi, freq[Math.Abs(yi - (freq.Count() - 1))]);
                     }
                 }
                 btm_i++;

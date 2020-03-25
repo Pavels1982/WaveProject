@@ -34,7 +34,7 @@ namespace VoiceСhanging.Models
         public int LastX { get; set; }
 
         public bool IsMagnitude { get; set; } = false;
-        public int MaxFFTWidth { get; set; } = 1024;
+        public int MaxFFTWidth { get; set; } = 2048;
 
         public ObservableCollection<string> ListWindowFunc { get; set; } = new ObservableCollection<string>();
 
@@ -65,7 +65,7 @@ namespace VoiceСhanging.Models
         public event WindowPositionHandler WindowPositionChanged;
         public delegate void WindowPositionHandler(int value);
 
-        private int WindowWidth = 2048;
+        private int WindowWidth = 4096;
 
 
         public int Width
@@ -95,7 +95,7 @@ namespace VoiceСhanging.Models
             }
             set
             {
-                if (value > 20 && value < 2048)
+                if (value > 20 && value < 4096)
                 {
                     this.fftwidth = value;
                     FFTModel.Axes[0].MaximumRange = value;
@@ -146,7 +146,7 @@ namespace VoiceСhanging.Models
            // FFTModel.Series.Add(Bar);
             FFTModel.Series.Add(FFTLine);
 
-            Func<double, string> str = (Label =>   (Label * 22f).ToString());
+            Func<double, string> str = (Label =>   (Label * 44f).ToString());
 
             LinearAxis xAxis = new LinearAxis()
             {

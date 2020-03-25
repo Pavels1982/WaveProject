@@ -56,3 +56,4 @@ D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartAnalizerVi
 D:\Новая папка\Wave\WaveProject\obj\Debug\UserControls\ChartAnalizerView.baml
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartAnalizerView.g.cs
 C:\Users\Pavel\Desktop\Работа\VoiceСhanging\VoiceСhanging\obj\Debug\UserControls\ChartAnalizerView.baml
+D:\Новая папка\Wave\WaveProject\obj\Debug\VoiceСhanging.csprojResolveAssemblyReference.cache
