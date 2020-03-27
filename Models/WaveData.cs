@@ -235,6 +235,12 @@ namespace VoiceСhanging.Models
             public int Subchunk2Size { get; set; }// numSamples * numChannels * bitsPerSample/8   
         }
 
+        private void Play(byte[] freq)
+        {
+
+          
+        }
+
 
 
     }
